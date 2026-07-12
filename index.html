@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kasir AYA GROUP</title>
+    <title>Kasir AYA GROUP (Firebase Realtime & Multi-Payment)</title>
     <!-- Tailwind CSS untuk tampilan modern & responsif -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <!-- Chart.js untuk Grafik Rekap Produk Terlaris -->
@@ -48,9 +48,11 @@
                 
                 <!-- Filter Tombol Kategori Menu -->
                 <div class="flex gap-2 mb-4 border-b border-gray-200 pb-3 overflow-x-auto">
-                    <button id="btn-kat-makanan" onclick="filterKategori('makanan')" class="px-4 py-2 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition cursor-pointer whitespace-nowrap">🍲 Makanan / Topping</button>
+                    <button id="btn-kat-topping" onclick="filterKategori('topping')" class="px-4 py-2 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition cursor-pointer whitespace-nowrap">🍢 Topping / Krupuk Seblak</button>
+                    <button id="btn-kat-makanan" onclick="filterKategori('makanan')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">🍲 Makanan / Bakaran</button>
                     <button id="btn-kat-dingin" onclick="filterKategori('dingin')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">❄️ Minuman Dingin</button>
-                    <button id="btn-kat-panas" onclick="filterKategori('panas')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">☕ Minuman Hangat / Panas</button>
+                    <button id="btn-kat-panas" onclick="filterKategori('panas')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">☕ Minuman Hangat</button>
+                    <button id="btn-kat-jajanan" onclick="filterKategori('jajanan')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">🚬 Jajanan / Rokok</button>
                 </div>
 
                 <!-- Container Grid Tombol Menu -->
@@ -70,15 +72,45 @@
 
                 <!-- Bagian Total & Pembayaran -->
                 <div class="bg-orange-100/50 p-4 rounded-lg mt-4 border border-orange-200">
+                    
+                    <!-- Opsi Tipe Pelayanan (Dimakan / Dibungkus) -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Tipe Pesanan:</label>
+                        <div class="grid grid-cols-2 gap-2 bg-white p-1 rounded-lg border border-orange-200">
+                            <label class="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold cursor-pointer text-gray-700">
+                                <input type="radio" name="tipePesanan" value="DINE_IN" checked onchange="updateKeranjang()" class="accent-orange-600"> Dine In
+                            </label>
+                            <label class="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold cursor-pointer text-gray-700">
+                                <input type="radio" name="tipePesanan" value="TAKE_AWAY" onchange="updateKeranjang()" class="accent-orange-600"> Dibungkus (+1k)
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Input Manual Ongkos Kirim -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Ongkos Kirim (Rp):</label>
+                        <input type="number" id="inputOngkir" oninput="updateKeranjang()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 text-xs font-bold" placeholder="0" min="0">
+                    </div>
+
                     <div class="flex justify-between text-lg font-bold mb-2 text-gray-800">
                         <span>Total:</span>
                         <span class="text-orange-600 text-xl" id="textTotal">Rp 0</span>
                     </div>
-                    <div class="mb-2">
+
+                    <!-- Pilihan Metode Pembayaran -->
+                    <div class="mb-3">
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Metode Pembayaran:</label>
+                        <div class="grid grid-cols-2 gap-2">
+                            <button id="btn-bayar-tunai" onclick="setMetodePembayaran('TUNAI')" class="py-2 text-center text-xs font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition">💵 TUNAI</button>
+                            <button id="btn-bayar-qris" onclick="setMetodePembayaran('QRIS')" class="py-2 text-center text-xs font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition">📱 QRIS</button>
+                        </div>
+                    </div>
+
+                    <div id="wrapperUangBayar" class="mb-2">
                         <label class="block text-xs font-semibold text-gray-600 mb-1">Uang Bayar (Rp):</label>
                         <input type="number" id="inputBayar" oninput="hitungKembalian()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 font-bold" placeholder="0">
                     </div>
-                    <div class="flex justify-between text-lg font-bold text-gray-700 mb-4">
+                    <div id="wrapperKembalian" class="flex justify-between text-lg font-bold text-gray-700 mb-4">
                         <span>Kembalian:</span>
                         <span id="textKembalian" class="text-gray-900">Rp 0</span>
                     </div>
@@ -132,20 +164,30 @@
                 </div>
             </div>
 
-            <!-- Statistik Utama & Kalkulasi Laba Rugi -->
+            <!-- Statistik Utama & Pemisahan Tunai/QRIS -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
-                    <p class="text-xs text-gray-500 font-semibold uppercase">Omset Penjualan</p>
-                    <p class="text-2xl font-bold text-emerald-600" id="statOmset">Rp 0</p>
+                <!-- Total Omset Keseluruhan -->
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col justify-between">
+                    <div>
+                        <p class="text-xs text-gray-500 font-semibold uppercase">Total Omset</p>
+                        <p class="text-2xl font-bold text-emerald-600" id="statOmset">Rp 0</p>
+                    </div>
+                    <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] space-y-0.5 text-gray-600">
+                        <div class="flex justify-between"><span>💵 Tunai:</span><span class="font-bold" id="statOmsetTunai">Rp 0</span></div>
+                        <div class="flex justify-between"><span>📱 QRIS:</span><span class="font-bold" id="statOmsetQris">Rp 0</span></div>
+                    </div>
                 </div>
+                <!-- Total Pengeluaran -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <p class="text-xs text-gray-500 font-semibold uppercase">Total Pengeluaran</p>
                     <p class="text-2xl font-bold text-red-500" id="statPengeluaran">Rp 0</p>
                 </div>
+                <!-- Laba Rugi -->
                 <div class="p-4 rounded-xl shadow border" id="boxLabaRugi">
                     <p class="text-xs text-gray-500 font-semibold uppercase" id="labelLabaRugi">Laba / Rugi Bersih</p>
                     <p class="text-2xl font-extrabold" id="statLabaRugi">Rp 0</p>
                 </div>
+                <!-- Jumlah Nota -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <p class="text-xs text-gray-500 font-semibold uppercase">Jumlah Nota</p>
                     <p class="text-2xl font-bold text-orange-500" id="statNota">0 Nota</p>
@@ -158,6 +200,16 @@
                     <h3 class="font-bold text-gray-700 mb-4">📊 Grafik Produk Terlaris Periode Ini</h3>
                     <canvas id="chartProdukLaku" width="400" height="200"></canvas>
                 </div>
+                <!-- Wadah Khusus Rekap Pengeluaran Detail -->
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
+                    <h3 class="font-bold text-gray-700 mb-4">💸 Rekap Pengeluaran Detail Periode Ini</h3>
+                    <div id="rekapPengeluaranDetail" class="space-y-2 max-h-[50vh] overflow-y-auto">
+                        <!-- List detail item pengeluaran terfilter -->
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 gap-6">
                 <!-- Riwayat Nota -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <h3 class="font-bold text-gray-700 mb-4">📜 Riwayat Nota Transaksi</h3>
@@ -176,6 +228,8 @@
         <div class="text-center text-[10px]">Pusat Kuliner Terbaik</div>
         <div class="text-center my-1">--------------------------------</div>
         <div id="notaWaktu" class="text-[10px]"></div>
+        <div id="notaMetode" class="text-[11px] font-bold"></div>
+        <div id="notaTipe" class="text-[11px]"></div>
         <div class="text-center my-1">--------------------------------</div>
         <!-- Wadah Item Transaksi -->
         <div id="notaItems" class="space-y-1"></div>
@@ -186,100 +240,146 @@
         <div class="text-center mt-3 text-[10px] font-bold">Terima Kasih!<br>Selamat Menikmati Hidangan Kami</div>
     </div>
 
+    <!-- Load Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
+
     <script>
-        // Database Menu Lengkap Terkategori
+        // 1. KONEKSIKAN KE FIREBASE ANDA
+        const firebaseConfig = {
+            apiKey: "AIzaSy...",
+            authDomain: "kasir-aya...",
+            databaseURL: "https://...", 
+            projectId: "kasir-aya...",
+            storageBucket: "kasir-aya...",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+        
+        let db = null;
+        try {
+            if (firebaseConfig.apiKey !== "AIzaSy...") {
+                firebase.initializeApp(firebaseConfig);
+                db = firebase.database();
+            }
+        } catch(e) { console.error("Firebase initialization failed", e); }
+
         const databaseMenu = [
-            // --- KATEGORI: MAKANAN / TOPPING ---
-            { id: 4, nama: "Kornet", harga: 500, kategori: "makanan" },
-            { id: 5, nama: "Pentol", harga: 1000, kategori: "makanan" },
-            { id: 6, nama: "Sosis Kecil", harga: 1000, kategori: "makanan" },
-            { id: 7, nama: "Sosis Merah", harga: 1500, kategori: "makanan" },
-            { id: 8, nama: "Sosis Salju", harga: 2000, kategori: "makanan" },
-            { id: 9, nama: "Sosis Jumbo", harga: 3500, kategori: "makanan" },
-            { id: 10, nama: "Bintang", harga: 1000, kategori: "makanan" },
-            { id: 11, nama: "Tempura", harga: 1000, kategori: "makanan" },
-            { id: 12, nama: "Scallop", harga: 1000, kategori: "makanan" },
-            { id: 13, nama: "Bakso Ikan", harga: 1500, kategori: "makanan" },
-            { id: 14, nama: "Tahu Bakso", harga: 2000, kategori: "makanan" },
-            { id: 15, nama: "Dumpling Ayam", harga: 2000, kategori: "makanan" },
-            { id: 16, nama: "Dumpling Keju", harga: 2000, kategori: "makanan" },
-            { id: 17, nama: "Dumpling Spicy", harga: 2000, kategori: "makanan" },
-            { id: 18, nama: "Odeng", harga: 2000, kategori: "makanan" },
-            { id: 19, nama: "Cikua", harga: 1000, kategori: "makanan" },
-            { id: 20, nama: "Fish Roll", harga: 2000, kategori: "makanan" },
-            { id: 21, nama: "Crab Stik", harga: 2000, kategori: "makanan" },
-            { id: 22, nama: "Ekor Udang", harga: 2000, kategori: "makanan" },
-            { id: 23, nama: "Udang Gulung", harga: 2500, kategori: "makanan" },
-            { id: 24, nama: "Kembang Cumi", harga: 1000, kategori: "makanan" },
-            { id: 25, nama: "Pilus", harga: 1000, kategori: "makanan" },
-            { id: 26, nama: "Cuanki Lidah", harga: 2000, kategori: "makanan" },
-            { id: 27, nama: "Sosis Kering", harga: 2000, kategori: "makanan" },
-            { id: 28, nama: "K. Rafael", harga: 1000, kategori: "makanan" },
-            { id: 29, nama: "K. Orange", harga: 1000, kategori: "makanan" },
-            { id: 30, nama: "K. Warna", harga: 1000, kategori: "makanan" },
-            { id: 31, nama: "K. Bintang", harga: 1000, kategori: "makanan" },
-            { id: 32, nama: "K. Tangga", harga: 1000, kategori: "makanan" },
-            { id: 33, nama: "Enoki", harga: 1000, kategori: "makanan" },
-            { id: 34, nama: "Mie", harga: 1000, kategori: "makanan" },
-            { id: 35, nama: "Mie Tulang", harga: 8000, kategori: "makanan" },
-            { id: 36, nama: "Gado gado", harga: 10000, kategori: "makanan" },
-            { id: 37, nama: "Seblak All Varian", harga: 8000, kategori: "makanan" },
-            { id: 38, nama: "Nasi Kucing", harga: 5000, kategori: "makanan" },
-            { id: 39, nama: "Nasi Bakar", harga: 5000, kategori: "makanan" },
-            { id: 40, nama: "Sayap bakar", harga: 5000, kategori: "makanan" },
-            { id: 41, nama: "Kepala", harga: 3000, kategori: "makanan" },
-            { id: 42, nama: "Ceker", harga: 2000, kategori: "makanan" },
-            { id: 43, nama: "Tempe bacem", harga: 2000, kategori: "makanan" },
-            { id: 44, nama: "Tahu bacem", harga: 2000, kategori: "makanan" },
-            { id: 45, nama: "Telur puyuh bakar", harga: 3000, kategori: "makanan" },
-            { id: 46, nama: "Sate Usus", harga: 3000, kategori: "makanan" },
-            { id: 47, nama: "Sate Rempelo Ati", harga: 3000, kategori: "makanan" },
-            { id: 48, nama: "Sate frozen bakar", harga: 3000, kategori: "makanan" },
-            { id: 49, nama: "Sosis bakar", harga: 8000, kategori: "makanan" },
-            { id: 50, nama: "Cimol", harga: 3000, kategori: "makanan" },
+            // === KATEGORI: TOPPING / KRUPUK SEBLAK ===
+            { id: 101, nama: "Kornet", harga: 1000, kategori: "topping" },
+            { id: 102, nama: "Pentol", harga: 1000, kategori: "topping" },
+            { id: 103, nama: "Sosis Kecil", harga: 1000, kategori: "topping" },
+            { id: 104, nama: "Sosis Merah", harga: 1500, kategori: "topping" },
+            { id: 105, nama: "Sosis Salju", harga: 2000, kategori: "topping" },
+            { id: 106, nama: "Sosis Jumbo", harga: 5000, kategori: "topping" },
+            { id: 107, nama: "Bintang", harga: 1000, kategori: "topping" },
+            { id: 108, nama: "Tempura", harga: 1500, kategori: "topping" },
+            { id: 109, nama: "Scallop", harga: 1000, kategori: "topping" },
+            { id: 110, nama: "Bakso Ikan", harga: 1500, kategori: "topping" },
+            { id: 111, nama: "Tahu Bakso", harga: 1000, kategori: "topping" },
+            { id: 112, nama: "Dumpling Ayam", harga: 2000, kategori: "topping" },
+            { id: 113, nama: "Dumpling Keju", harga: 2000, kategori: "topping" },
+            { id: 114, nama: "Dumpling Spicy", harga: 2000, kategori: "topping" },
+            { id: 115, nama: "Odeng", harga: 2000, kategori: "topping" },
+            { id: 116, nama: "Cikua", harga: 1000, kategori: "topping" },
+            { id: 117, fontColor: "Fish Roll", nama: "Fish Roll", harga: 2000, kategori: "topping" },
+            { id: 118, nama: "Crab Stik", harga: 2000, kategori: "topping" },
+            { id: 119, nama: "Ekor Udang", harga: 2000, kategori: "topping" },
+            { id: 120, nama: "Udang Gulung", harga: 2500, kategori: "topping" },
+            { id: 121, nama: "Kembang Cumi", harga: 1000, kategori: "topping" },
+            { id: 122, nama: "Pilus", harga: 1000, kategori: "topping" },
+            { id: 123, nama: "Cuanki Lidah", harga: 2000, kategori: "topping" },
+            { id: 124, nama: "Siomay Kering", harga: 2000, kategori: "topping" },
+            { id: 125, nama: "Krupuk Rafael", harga: 1000, kategori: "topping" },
+            { id: 126, nama: "Krupuk Orange", harga: 1000, kategori: "topping" },
+            { id: 127, nama: "Krupuk Warna", harga: 1000, kategori: "topping" },
+            { id: 128, nama: "Krupuk Bintang", harga: 1000, kategori: "topping" },
+            { id: 129, nama: "Krupuk Tangga", harga: 1000, kategori: "topping" },
+            { id: 130, nama: "Jamur Enoki", harga: 1000, kategori: "topping" },
+            { id: 131, nama: "Mie lombok", harga: 1000, kategori: "topping" },
 
-            // --- KATEGORI: MINUMAN DINGIN ---
-            { id: 1, nama: "Es Teh", harga: 4000, kategori: "dingin" },
-            { id: 2, nama: "Es Dawet", harga: 5000, kategori: "dingin" },
-            { id: 3, nama: "Es Teller", harga: 10000, kategori: "dingin" },
-            { id: 62, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
-            { id: 63, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
-            { id: 64, nama: "Milo ice", harga: 6000, kategori: "dingin" },
-            { id: 65, font: 6000, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
-            { id: 66, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
-            { id: 67, nama: "Bonteh Tarik", harga: 5000, kategori: "dingin" },
-            { id: 68, nama: "Uyu Ice", harga: 5000, kategori: "dingin" },
-            { id: 69, nama: "Beng Beng Ice", harga: 6000, kategori: "dingin" },
-            { id: 70, nama: "Chocolatos Ice", harga: 6000, kategori: "dingin" },
-            { id: 71, nama: "Kuku Bima Susu Ice", harga: 7000, kategori: "dingin" },
-            { id: 72, nama: "Extra Jos Susu Ice", harga: 7000, kategori: "dingin" },
-            { id: 73, nama: "Hemaviton Susu Ice", harga: 7000, kategori: "dingin" },
-            { id: 74, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
-            { id: 75, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
+            // === KATEGORI: MAKANAN / SATE-SATEAN / BAKARAN ===
+            { id: 201, nama: "Mie Tulang", harga: 8000, kategori: "makanan" },
+            { id: 202, nama: "Gado gado", harga: 12000, kategori: "makanan" },
+            { id: 203, nama: "Seblak All Varian", harga: 8000, kategori: "makanan" },
+            { id: 204, nama: "Nasi Kucing", harga: 5000, kategori: "makanan" },
+            { id: 205, nama: "Nasi Bakar", harga: 5000, kategori: "makanan" },
+            { id: 206, nama: "Sayap bakar", harga: 5000, kategori: "makanan" },
+            { id: 207, nama: "Kepala (Mulai)", harga: 3000, kategori: "makanan" },
+            { id: 208, nama: "Ceker (Mulai)", harga: 2000, kategori: "makanan" },
+            { id: 209, nama: "Tempe bacem", harga: 2000, kategori: "makanan" },
+            { id: 210, nama: "Tahu bacem", harga: 2000, kategori: "makanan" },
+            { id: 211, nama: "Telur puyuh bakar", harga: 3000, kategori: "makanan" },
+            { id: 212, nama: "Sate Usus", harga: 3000, kategori: "makanan" },
+            { id: 213, nama: "Sate Rempelo Ati", harga: 3000, kategori: "makanan" },
+            { id: 214, nama: "Sate Lok Lok", harga: 3000, kategori: "makanan" },
+            { id: 215, nama: "Sosis bakar", harga: 8000, kategori: "makanan" },
 
-            // --- KATEGORI: MINUMAN HANGAT / PANAS ---
-            { id: 51, nama: "Teh Hangat", harga: 4000, kategori: "panas" },
-            { id: 52, nama: "Kopi Hitam racik", harga: 5000, kategori: "panas" },
-            { id: 53, nama: "Top Coffee Gula aren panas", harga: 6000, kategori: "panas" },
-            { id: 54, nama: "Susu Jahe Panas", harga: 5000, kategori: "panas" },
-            { id: 55, nama: "Top Kopi Susu", harga: 5000, kategori: "panas" },
-            { id: 56, nama: "Kopi Susu Racik", harga: 6000, kategori: "panas" },
-            { id: 57, nama: "Kopi Kapal Api", harga: 5000, kategori: "panas" },
-            { id: 58, nama: "Top Kopi Hitam", harga: 5000, kategori: "panas" },
-            { id: 59, nama: "Kopi Brontoseno", harga: 5000, kategori: "panas" },
-            { id: 60, nama: "Kopi Luwak Hitam", harga: 5000, kategori: "panas" },
-            { id: 61, nama: "Luwak White Coffee", harga: 5000, kategori: "panas" }
+            // === KATEGORI: MINUMAN DINGIN ===
+            { id: 301, nama: "Es Teh", harga: 4000, kategori: "dingin" },
+            { id: 302, nama: "Es Dawet", harga: 5000, kategori: "dingin" },
+            { id: 303, nama: "Es Teller", harga: 10000, kategori: "dingin" },
+            { id: 304, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
+            { id: 305, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
+            { id: 306, nama: "Milo ice", harga: 6000, kategori: "dingin" },
+            { id: 307, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
+            { id: 308, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
+            { id: 309, nama: "Bonteh Tarik", harga: 5000, kategori: "dingin" },
+            { id: 310, nama: "Uyu Ice", harga: 5000, kategori: "dingin" },
+            { id: 311, nama: "Beng Beng Ice", harga: 6000, kategori: "dingin" },
+            { id: 312, nama: "Chocolatos Ice", harga: 6000, kategori: "dingin" },
+            { id: 313, nama: "Kuku Bima Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 314, nama: "Extra Jos Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 315, nama: "Hemaviton Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 316, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
+            { id: 317, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
+
+            // === KATEGORI: MINUMAN PANAS / HANGAT ===
+            { id: 401, nama: "Teh Hangat", harga: 4000, kategori: "panas" },
+            { id: 402, nama: "Kopi Hitam Racik", harga: 5000, kategori: "panas" },
+            { id: 403, nama: "Top Coffee Gula aren panas", harga: 6000, kategori: "panas" },
+            { id: 404, nama: "Susu Jahe Panas", harga: 5000, kategori: "panas" },
+            { id: 405, nama: "Top Kopi Susu", harga: 5000, kategori: "panas" },
+            { id: 406, nama: "Kopi Susu Racik", harga: 6000, kategori: "panas" },
+            { id: 407, nama: "Kopi Kapal Api", harga: 5000, kategori: "panas" },
+            { id: 408, nama: "Top Kopi HItam", harga: 5000, kategori: "panas" },
+            { id: 409, nama: "Kopi Brontoseno", harga: 5000, kategori: "panas" },
+            { id: 410, nama: "Kopi Luwak Hitam", harga: 5000, kategori: "panas" },
+            { id: 411, nama: "Luwak White Coffee", harga: 5000, kategori: "panas" },
+
+            // === KATEGORI: JAJANAN / ROKOK KETENGAN ===
+            { id: 501, nama: "Roti Nolanda", harga: 3000, kategori: "jajanan" },
+            { id: 502, nama: "Roti Sisir Bareto", harga: 3000, kategori: "jajanan" },
+            { id: 503, nama: "Batagor Ikan (1 porsi)", harga: 5000, kategori: "jajanan" },
+            { id: 504, nama: "Cimol", harga: 3000, kategori: "jajanan" },
+            { id: 505, nama: "Surya (1 batang)", harga: 3000, kategori: "jajanan" }
         ];
 
         let keranjang = [];
         let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
         let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
-        let kategoriAktif = 'makanan';
+        let kategoriAktif = 'topping';
+        let metodePembayaran = 'TUNAI';
         let myChart = null;
-        
-        // State Filter Laporan
         let tanggalMulaiTerpilih = null;
         let tanggalSelesaiTerpilih = null;
+
+        if (db) {
+            db.ref('transaksi').on('value', (snapshot) => {
+                const data = snapshot.val();
+                riwayatTransaksi = data ? Object.values(data).reverse() : [];
+                localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+                if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
+            });
+
+            db.ref('pengeluaran').on('value', (snapshot) => {
+                const data = snapshot.val();
+                pengeluaran = data ? Object.values(data).reverse() : [];
+                localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
+                renderPengeluaran();
+                if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
+            });
+        }
 
         function renderMenu() {
             const container = document.getElementById('container-menu');
@@ -297,12 +397,35 @@
 
         function filterKategori(kategori) {
             kategoriAktif = kategori;
-            ['makanan', 'dingin', 'panas'].forEach(kat => {
+            ['topping', 'makanan', 'dingin', 'panas', 'jajanan'].forEach(kat => {
                 const btn = document.getElementById('btn-kat-' + kat);
-                btn.className = "px-4 py-2 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap " + 
-                                (kat === kategori ? "bg-orange-500 text-white shadow" : "bg-gray-100 text-gray-700");
+                if (btn) {
+                    btn.className = "px-4 py-2 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap " + 
+                                    (kat === kategori ? "bg-orange-500 text-white shadow" : "bg-gray-100 text-gray-700");
+                }
             });
             renderMenu();
+        }
+
+        function setMetodePembayaran(metode) {
+            metodePembayaran = metode;
+            const btnTunai = document.getElementById('btn-bayar-tunai');
+            const btnQris = document.getElementById('btn-bayar-qris');
+            const wrapBayar = document.getElementById('wrapperUangBayar');
+            const wrapKembali = document.getElementById('wrapperKembalian');
+
+            if (metode === 'TUNAI') {
+                btnTunai.className = "py-2 text-center text-xs font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition";
+                btnQris.className = "py-2 text-center text-xs font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
+                wrapBayar.classList.remove('hidden');
+                wrapKembali.classList.remove('hidden');
+            } else {
+                btnQris.className = "py-2 text-center text-xs font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition";
+                btnTunai.className = "py-2 text-center text-xs font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
+                wrapBayar.classList.add('hidden');
+                wrapKembali.classList.add('hidden');
+            }
+            hitungKembalian();
         }
 
         function tambahItem(id) {
@@ -311,7 +434,7 @@
             if (ada) {
                 ada.qty += 1;
             } else {
-                keranjang.push({ ...produk, qty: 1, tanggalInput: new Date().toISOString().split('T')[0] });
+                keranjang.push({ ...produk, qty: 1 });
             }
             updateKeranjang();
         }
@@ -327,6 +450,18 @@
             updateKeranjang();
         }
 
+        function hitungTotalKeseluruhan() {
+            let totalBelanja = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            
+            if (keranjang.length === 0) return 0;
+
+            let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
+            let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
+            let biayaStyrofoam = (tipePesanan === 'TAKE_AWAY') ? 1000 : 0;
+
+            return totalBelanja + ongkir + biayaStyrofoam;
+        }
+
         function updateKeranjang() {
             const container = document.getElementById('tabelKeranjang');
             if (keranjang.length === 0) {
@@ -337,10 +472,8 @@
             }
 
             let html = '<div class="space-y-1.5">';
-            let total = 0;
             keranjang.forEach(item => {
                 let subtotal = item.harga * item.qty;
-                total += subtotal;
                 html += `
                     <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
                         <div class="flex-1 min-w-0 pr-1">
@@ -358,12 +491,18 @@
             });
             html += '</div>';
             container.innerHTML = html;
-            document.getElementById('textTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+
+            let totalAkhir = hitungTotalKeseluruhan();
+            document.getElementById('textTotal').innerText = 'Rp ' + totalAkhir.toLocaleString('id-ID');
             hitungKembalian();
         }
 
         function hitungKembalian() {
-            let total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            let total = hitungTotalKeseluruhan();
+            if (metodePembayaran === 'QRIS') {
+                document.getElementById('textKembalian').innerText = 'Rp 0';
+                return;
+            }
             let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
             let kembalian = bayar - total;
             document.getElementById('textKembalian').innerText = kembalian >= 0 ? 'Rp ' + kembalian.toLocaleString('id-ID') : 'Uang Kurang';
@@ -372,27 +511,48 @@
         function bersihkanKeranjang() {
             keranjang = [];
             document.getElementById('inputBayar').value = '';
+            document.getElementById('inputOngkir').value = '';
+            document.querySelector('input[name="tipePesanan"][value="DINE_IN"]').checked = true;
+            setMetodePembayaran('TUNAI');
             updateKeranjang();
         }
 
         function simpanTransaksi() {
             if (keranjang.length === 0) { alert('Keranjang kosong!'); return false; }
-            let total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
-            let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
-            if (bayar < total) { alert('Uang pembayaran Anda masih kurang!'); return false; }
+            let total = hitungTotalKeseluruhan();
+            let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
+            let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
+            
+            let bayar = total;
+            let kembalian = 0;
 
+            if (metodePembayaran === 'TUNAI') {
+                bayar = parseInt(document.getElementById('inputBayar').value) || 0;
+                if (bayar < total) { alert('Uang pembayaran Anda masih kurang!'); return false; }
+                kembalian = bayar - total;
+            }
+
+            let idNota = 'NOTA-' + Date.now();
             let nota = {
-                id: 'NOTA-' + Date.now(),
+                id: idNota,
                 waktu: new Date().toLocaleString('id-ID'),
-                tanggalISO: new Date().toISOString().split('T')[0], // Digunakan untuk filter laporan tanggal
+                tanggalISO: new Date().toISOString().split('T')[0],
                 items: [...keranjang],
                 total: total,
                 bayar: bayar,
-                kembalian: bayar - total
+                kembalian: kembalian,
+                metodePembayaran: metodePembayaran,
+                tipePesanan: tipePesanan,
+                ongkir: ongkir
             };
 
-            riwayatTransaksi.unshift(nota);
-            localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+            if (db) {
+                db.ref('transaksi/' + idNota).set(nota);
+            } else {
+                riwayatTransaksi.unshift(nota);
+                localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+                updateLaporan();
+            }
             return true;
         }
 
@@ -404,20 +564,25 @@
             }
         }
 
-        // Fungsi Cetak Nota yang sudah diperbaiki alur delay renderingnya
         function cetakNota() {
             if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
-            let total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
-            let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
-            if (bayar < total) return alert('Input uang bayar dengan benar sebelum mencetak!');
+            let total = hitungTotalKeseluruhan();
+            let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
+            let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
+            
+            let bayar = total;
+            if (metodePembayaran === 'TUNAI') {
+                bayar = parseInt(document.getElementById('inputBayar').value) || 0;
+                if (bayar < total) return alert('Input uang bayar dengan benar sebelum mencetak!');
+            }
 
-            // 1. Isikan Data Waktu
             document.getElementById('notaWaktu').innerHTML = `
                 <div>Waktu: ${new Date().toLocaleString('id-ID')}</div>
                 <div>No   : REG-${Date.now().toString().slice(-6)}</div>
             `;
+            document.getElementById('notaMetode').innerHTML = `METODE PEMBAYARAN: ${metodePembayaran}`;
+            document.getElementById('notaTipe').innerHTML = `TIPE PESANAN: ${tipePesanan === 'TAKE_AWAY' ? 'DIBUNGKUS' : 'DIMAKAN DI TEMPAT'}`;
             
-            // 2. Isikan Data Item Produk
             let htmlItems = '';
             keranjang.forEach(item => {
                 let subtotal = item.harga * item.qty;
@@ -431,20 +596,30 @@
                     </div>
                 `;
             });
+            
+            if(tipePesanan === 'TAKE_AWAY') {
+                htmlItems += `
+                    <div class="flex justify-between font-bold text-gray-900"><span>STEREOFOAM (BUNGKUS)</span></div>
+                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  1 x Rp 1.000</span><span>Rp 1.000</span></div>
+                `;
+            }
+            if(ongkir > 0) {
+                htmlItems += `
+                    <div class="flex justify-between font-bold text-gray-900"><span>ONGKOS KIRIM</span></div>
+                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  Manual Input</span><span>Rp ${ongkir.toLocaleString('id-ID')}</span></div>
+                `;
+            }
+
             document.getElementById('notaItems').innerHTML = htmlItems;
             
-            // 3. Isikan Data Perhitungan Kas
             document.getElementById('notaTotal').innerHTML = `
                 <div class="flex justify-between font-bold text-[13px] mt-1"><span>TOTAL :</span><span>Rp ${total.toLocaleString('id-ID')}</span></div>
                 <div class="flex justify-between text-gray-800"><span>BAYAR :</span><span>Rp ${bayar.toLocaleString('id-ID')}</span></div>
                 <div class="flex justify-between text-gray-800 font-bold"><span>KEMBALI:</span><span>Rp ${(bayar - total).toLocaleString('id-ID')}</span></div>
             `;
             
-            // 4. BERI TIMEOUT MICRO DETIK: Agar HTML Nota Terisi Sempurna Sebelum Layar Cetak Browser Muncul
             setTimeout(() => {
                 window.print();
-
-                // 5. Simpan data & bersihkan keranjang setelah dialog cetak dipicu
                 let sukses = simpanTransaksi();
                 if(sukses) {
                     bersihkanKeranjang();
@@ -457,16 +632,26 @@
             let biaya = parseInt(document.getElementById('biayaPengeluaran').value) || 0;
             if(!nama || biaya <= 0) return alert('Silakan masukkan nama barang & harga yang benar!');
 
-            pengeluaran.unshift({ 
-                nama, 
-                biaya, 
+            let idPengeluaran = 'EXP-' + Date.now();
+            let dataPengeluaran = { 
+                id: idPengeluaran,
+                nama: nama, 
+                biaya: biaya, 
                 waktu: new Date().toLocaleString('id-ID'),
                 tanggalISO: new Date().toISOString().split('T')[0] 
-            });
-            localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
+            };
+
+            if (db) {
+                db.ref('pengeluaran/' + idPengeluaran).set(dataPengeluaran);
+            } else {
+                pengeluaran.unshift(dataPengeluaran);
+                localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
+                renderPengeluaran();
+                updateLaporan();
+            }
+
             document.getElementById('namaPengeluaran').value = '';
             document.getElementById('biayaPengeluaran').value = '';
-            renderPengeluaran();
             alert('Pengeluaran berhasil dicatat!');
         }
 
@@ -478,12 +663,10 @@
             });
         }
 
-        // ================= LOGIKA BARU: FILTER REKAP PERIODE TANGGAL =================
         function terapkanFilterTanggal() {
             let mulai = document.getElementById('filterTanggalMulai').value;
             let selesai = document.getElementById('filterTanggalSelesai').value;
             if(!mulai || !selesai) return alert('Silakan pilih rentang tanggal mulai dan selesai!');
-            
             tanggalMulaiTerpilih = mulai;
             tanggalSelesaiTerpilih = selesai;
             updateLaporan();
@@ -500,27 +683,39 @@
         function updateLaporan() {
             let hariIniISO = new Date().toISOString().split('T')[0];
 
-            // Filter data transaksi berdasarkan range tanggal / default Hari Ini
             let transaksiTerfilter = riwayatTransaksi.filter(n => {
                 if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
                     return n.tanggalISO >= tanggalMulaiTerpilih && n.tanggalISO <= tanggalSelesaiTerpilih;
                 }
-                return n.tanggalISO === hariIniISO; // Default perhari (Hari Ini)
+                return n.tanggalISO === hariIniISO;
             });
 
-            // Filter data pengeluaran berdasarkan range tanggal / default Hari Ini
             let pengeluaranTerfilter = pengeluaran.filter(p => {
                 if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
                     return p.tanggalISO >= tanggalMulaiTerpilih && p.tanggalISO <= tanggalSelesaiTerpilih;
                 }
-                return p.tanggalISO === hariIniISO; // Default perhari (Hari Ini)
+                return p.tanggalISO === hariIniISO;
             });
 
-            let omset = transaksiTerfilter.reduce((sum, n) => sum + n.total, 0);
-            let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
-            let labaRugiBersih = omset - totalBeban;
+            let omsetTotal = 0;
+            let omsetTunai = 0;
+            let omsetQris = 0;
 
-            document.getElementById('statOmset').innerText = 'Rp ' + omset.toLocaleString('id-ID');
+            transaksiTerfilter.forEach(n => {
+                omsetTotal += n.total;
+                if (n.metodePembayaran === 'QRIS') {
+                    omsetQris += n.total;
+                } else {
+                    omsetTunai += n.total;
+                }
+            });
+
+            let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
+            let labaRugiBersih = omsetTotal - totalBeban;
+
+            document.getElementById('statOmset').innerText = 'Rp ' + omsetTotal.toLocaleString('id-ID');
+            document.getElementById('statOmsetTunai').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
+            document.getElementById('statOmsetQris').innerText = 'Rp ' + omsetQris.toLocaleString('id-ID');
             document.getElementById('statPengeluaran').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
             document.getElementById('statNota').innerText = transaksiTerfilter.length + ' Nota';
 
@@ -538,31 +733,49 @@
                 elBox.className = "p-4 rounded-xl shadow border bg-red-50 border-red-200 text-red-700";
             }
 
-            // Render list nota riwayat terfilter
+            // Render Rekap Pengeluaran Detail di Tab Laporan
+            let containerRekapPengeluaran = document.getElementById('rekapPengeluaranDetail');
+            containerRekapPengeluaran.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada pengeluaran pada periode ini</p>' : '';
+            pengeluaranTerfilter.forEach(p => {
+                containerRekapPengeluaran.innerHTML += `
+                    <div class="flex justify-between items-center p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
+                        <div>
+                            <p class="font-bold text-gray-800 uppercase">📌 ${p.nama}</p>
+                            <p class="text-[10px] text-gray-400">🕒 ${p.waktu}</p>
+                        </div>
+                        <span class="font-extrabold text-red-600">Rp ${p.biaya.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+
             let containerNota = document.getElementById('riwayatNota');
             containerNota.innerHTML = transaksiTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada riwayat transaksi pada periode ini</p>' : '';
             transaksiTerfilter.forEach(n => {
                 let itemDetail = n.items.map(i => `${i.nama} (${i.qty}x)`).join(', ');
+                if (n.tipePesanan === 'TAKE_AWAY') itemDetail += ' + Styrofoam';
+                if (n.ongkir > 0) itemDetail += ` + Ongkir(Rp ${n.ongkir.toLocaleString('id-ID')})`;
+
+                let badgeColor = (n.metodePembayaran === 'QRIS') ? 'bg-blue-100 text-blue-800' : 'bg-green-100 text-green-800';
+                let badgeMetode = n.metodePembayaran || 'TUNAI';
+
                 containerNota.innerHTML += `
                     <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
-                        <div class="flex justify-between font-bold text-gray-800 mb-1"><span>🧾 ${n.id}</span><span class="text-emerald-600">Rp ${n.total.toLocaleString('id-ID')}</span></div>
+                        <div class="flex justify-between font-bold text-gray-800 mb-1">
+                            <span>🧾 ${n.id} <span class="ml-2 px-2 py-0.5 text-[10px] rounded font-extrabold ${badgeColor}">${badgeMetode}</span></span>
+                            <span class="text-emerald-600">Rp ${n.total.toLocaleString('id-ID')}</span>
+                        </div>
                         <p class="mb-1 text-gray-400">🕒 ${n.waktu}</p>
                         <p class="text-orange-700 font-medium">📦 ${itemDetail}</p>
                     </div>
                 `;
             });
 
-            // Hitung statistik produk terlaris terfilter
             let produkCounts = {};
             transaksiTerfilter.forEach(n => {
-                n.items.forEach(i => {
-                    produkCounts[i.nama] = (produkCounts[i.nama] || 0) + i.qty;
-                });
+                n.items.forEach(i => { produkCounts[i.nama] = (produkCounts[i.nama] || 0) + i.qty; });
             });
-
             let urutProduk = Object.keys(produkCounts).map(name => ({ name, qty: produkCounts[name] })).sort((a,b) => b.qty - a.qty).slice(0, 5);
 
-            // Perbarui grafik
             if (myChart) myChart.destroy();
             const ctx = document.getElementById('chartProdukLaku').getContext('2d');
             myChart = new Chart(ctx, {
@@ -588,7 +801,8 @@
             if(tab === 'laporan') updateLaporan();
         }
 
-        filterKategori('makanan');
+        // Set default kategori awal saat aplikasi dibuka
+        filterKategori('topping');
         renderPengeluaran();
     </script>
 </body>
