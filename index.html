@@ -240,37 +240,30 @@
         <div class="text-center mt-3 text-[10px] font-bold">Terima Kasih!<br>Selamat Menikmati Hidangan Kami</div>
     </div>
 
-    <!-- Load Firebase SDK -->
+    <!-- Load Firebase SDK Versi Compat agar aman dan berjalan lancar -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
         // 1. KONEKSIKAN KE FIREBASE ANDA
-       // Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-// TODO: Add SDKs for Firebase products that you want to use
-// https://firebase.google.com/docs/web/setup#available-libraries
+        const firebaseConfig = {
+            apiKey: "AIzaSyCx0u4ka3lhjiPm84hI8U7v37GNusCvPaE",
+            authDomain: "kasir-aya-group-e6fb4.firebaseapp.com",
+            databaseURL: "https://kasir-aya-group-e6fb4-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "kasir-aya-group-e6fb4",
+            storageBucket: "kasir-aya-group-e6fb4.firebasestorage.app",
+            messagingSenderId: "654765768336",
+            appId: "1:654765768336:web:7fb865aaf00e371de36215"
+        };
 
-// Your web app's Firebase configuration
-const firebaseConfig = {
-  apiKey: "AIzaSyCx0u4ka3lhjiPm84hI8U7v37GNusCvPaE",
-  authDomain: "kasir-aya-group-e6fb4.firebaseapp.com",
-  projectId: "kasir-aya-group-e6fb4",
-  storageBucket: "kasir-aya-group-e6fb4.firebasestorage.app",
-  messagingSenderId: "654765768336",
-  appId: "1:654765768336:web:7fb865aaf00e371de36215"
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
-        
+        // Inisialisasi Firebase secara aman dan terstruktur
         let db = null;
         try {
-            if (firebaseConfig.apiKey !== "AIzaSy...") {
-                firebase.initializeApp(firebaseConfig);
-                db = firebase.database();
-            }
-        } catch(e) { console.error("Firebase initialization failed", e); }
+            firebase.initializeApp(firebaseConfig);
+            db = firebase.database();
+        } catch(e) { 
+            console.error("Firebase initialization failed", e); 
+        }
 
         const databaseMenu = [
             // === KATEGORI: TOPPING / KRUPUK SEBLAK ===
@@ -290,7 +283,7 @@ const app = initializeApp(firebaseConfig);
             { id: 114, nama: "Dumpling Spicy", harga: 2000, kategori: "topping" },
             { id: 115, nama: "Odeng", harga: 2000, kategori: "topping" },
             { id: 116, nama: "Cikua", harga: 1000, kategori: "topping" },
-            { id: 117, fontColor: "Fish Roll", nama: "Fish Roll", harga: 2000, kategori: "topping" },
+            { id: 117, nama: "Fish Roll", harga: 2000, kategori: "topping" },
             { id: 118, nama: "Crab Stik", harga: 2000, kategori: "topping" },
             { id: 119, nama: "Ekor Udang", harga: 2000, kategori: "topping" },
             { id: 120, nama: "Udang Gulung", harga: 2500, kategori: "topping" },
@@ -302,7 +295,7 @@ const app = initializeApp(firebaseConfig);
             { id: 126, nama: "Krupuk Orange", harga: 1000, kategori: "topping" },
             { id: 127, nama: "Krupuk Warna", harga: 1000, kategori: "topping" },
             { id: 128, nama: "Krupuk Bintang", harga: 1000, kategori: "topping" },
-            { id: 129, nama: "Krupuk Tangga", harga: 1000, kategori: "topping" },
+            { id: 129, nama: "Krupuk Tangga", fontColor: "black", harga: 1000, kategori: "topping" },
             { id: 130, nama: "Jamur Enoki", harga: 1000, kategori: "topping" },
             { id: 131, nama: "Mie lombok", harga: 1000, kategori: "topping" },
 
@@ -338,7 +331,7 @@ const app = initializeApp(firebaseConfig);
             { id: 312, nama: "Chocolatos Ice", harga: 6000, kategori: "dingin" },
             { id: 313, nama: "Kuku Bima Susu Ice", harga: 7000, kategori: "dingin" },
             { id: 314, nama: "Extra Jos Susu Ice", harga: 7000, kategori: "dingin" },
-            { id: 315, nama: "Hemaviton Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 315, nama: "Hemaviton Susu Ice", fontColor: "black", harga: 7000, kategori: "dingin" },
             { id: 316, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
             { id: 317, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
 
@@ -809,7 +802,7 @@ const app = initializeApp(firebaseConfig);
             if(tab === 'laporan') updateLaporan();
         }
 
-        // Set default kategori awal saat aplikasi dibuka
+        // Set default kategori awal & muat menu saat halaman pertama kali dijalankan
         filterKategori('topping');
         renderPengeluaran();
     </script>
