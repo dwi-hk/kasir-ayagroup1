@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kasir AYA GROUP</title>
+    <!-- Tailwind CSS untuk tampilan modern & responsif -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <!-- Chart.js untuk Grafik Rekap Produk Terlaris -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        /* Desain struk belanja khusus cetak printer thermal */
+        @media print {
+            body * { visibility: hidden; }
+            #areaNota, #areaNota * { visibility: visible; }
+            #areaNota { 
+                position: absolute; 
+                left: 0; 
+                top: 0; 
+                width: 100%; 
+                font-family: monospace; 
+                color: #000;
+            }
+        }
+    </style>
+</head>
+<body class="bg-orange-50 font-sans text-gray-800 min-h-screen flex flex-col">
+
+    <!-- Header Utama Aplikasi -->
+    <header class="bg-orange-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center flex-wrap gap-2">
+        <h1 class="text-2xl font-bold tracking-wider">🍊 AYA GROUP KASIR</h1>
+        <div class="space-x-1 sm:space-x-2">
+            <button onclick="switchTab('kasir')" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-orange-800 text-white rounded font-semibold text-xs sm:text-sm hover:bg-orange-900 transition cursor-pointer">🛒 Kasir</button>
+            <button onclick="switchTab('pengeluaran')" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-orange-800 text-white rounded font-semibold text-xs sm:text-sm hover:bg-orange-900 transition cursor-pointer">💸 Pengeluaran</button>
+            <button onclick="switchTab('laporan')" class="px-3 py-1.5 sm:px-4 sm:py-2 bg-orange-800 text-white rounded font-semibold text-xs sm:text-sm hover:bg-orange-900 transition cursor-pointer">📊 Rekap & Grafik</button>
+        </div>
+    </header>
+
+    <div class="container mx-auto p-4 flex-1">
+        
+        <!-- ================= Halaman Kasir ================= -->
+        <div id="tab-kasir" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+            
+            <!-- Kolom Menu Pilihan (Kiri) -->
+            <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col">
+                <h2 class="text-xl font-bold text-orange-600 mb-2">➕ Pilihan Menu & Topping</h2>
+                <p class="text-xs text-gray-500 mb-4">Pilih kategori di bawah, lalu klik item untuk menambah pesanan.</p>
+                
+                <!-- Filter Tombol Kategori Menu -->
+                <div class="flex gap-2 mb-4 border-b border-gray-200 pb-3 overflow-x-auto">
+                    <button id="btn-kat-makanan" onclick="filterKategori('makanan')" class="px-4 py-2 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition cursor-pointer whitespace-nowrap">🍲 Makanan / Topping</button>
+                    <button id="btn-kat-dingin" onclick="filterKategori('dingin')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">❄️ Minuman Dingin</button>
+                    <button id="btn-kat-panas" onclick="filterKategori('panas')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">☕ Minuman Hangat / Panas</button>
+                </div>
+
+                <!-- Container Grid Tombol Menu -->
+                <div class="max-h-[60vh] overflow-y-auto pr-2 flex-1">
+                    <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="container-menu"></div>
+                </div>
+            </div>
+
+            <!-- Kolom Keranjang Belanja & Nota (Kanan) -->
+            <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col justify-between h-fit lg:sticky lg:top-24">
+                <div>
+                    <h2 class="text-xl font-bold text-orange-600 mb-4">📝 Detail Pesanan</h2>
+                    <div class="border-b pb-2 mb-2 max-h-[35vh] overflow-y-auto" id="tabelKeranjang">
+                        <p class="text-gray-400 text-center py-4">Belum ada item dipilih</p>
+                    </div>
+                </div>
+
+                <!-- Bagian Total & Pembayaran -->
+                <div class="bg-orange-100/50 p-4 rounded-lg mt-4 border border-orange-200">
+                    <div class="flex justify-between text-lg font-bold mb-2 text-gray-800">
+                        <span>Total:</span>
+                        <span class="text-orange-600 text-xl" id="textTotal">Rp 0</span>
+                    </div>
+                    <div class="mb-2">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Uang Bayar (Rp):</label>
+                        <input type="number" id="inputBayar" oninput="hitungKembalian()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 font-bold" placeholder="0">
+                    </div>
+                    <div class="flex justify-between text-lg font-bold text-gray-700 mb-4">
+                        <span>Kembalian:</span>
+                        <span id="textKembalian" class="text-gray-900">Rp 0</span>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-2">
+                        <button onclick="tombolSimpanSaja()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded shadow hover:bg-emerald-700 transition cursor-pointer">💾 Simpan</button>
+                        <button onclick="cetakNota()" class="w-full bg-blue-600 text-white font-bold py-2.5 rounded shadow hover:bg-blue-700 transition cursor-pointer">🖨️ Cetak Nota</button>
+                    </div>
+                    <button onclick="bersihkanKeranjang()" class="w-full mt-3 text-xs text-red-500 hover:underline block text-center cursor-pointer">Kosongkan Keranjang</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ================= Halaman Pengeluaran ================= -->
+        <div id="tab-pengeluaran" class="hidden bg-white p-6 rounded-xl shadow border border-orange-100 max-w-lg mx-auto">
+            <h2 class="text-xl font-bold text-orange-600 mb-4">💸 Catat Pengeluaran Operasional</h2>
+            <div class="space-y-3">
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Nama Pengeluaran / Barang:</label>
+                    <input type="text" id="namaPengeluaran" class="w-full p-2 border border-gray-300 rounded focus:outline-orange-500" placeholder="Contoh: Beli es batu, minyak goreng">
+                </div>
+                <div>
+                    <label class="block text-sm font-semibold text-gray-600 mb-1">Biaya (Rp):</label>
+                    <input type="number" id="biayaPengeluaran" class="w-full p-2 border border-gray-300 rounded focus:outline-orange-500" placeholder="0">
+                </div>
+                <button onclick="simpanPengeluaran()" class="w-full bg-orange-500 text-white font-bold py-2 rounded hover:bg-orange-600 transition cursor-pointer">➕ Tambah Pengeluaran</button>
+            </div>
+
+            <h3 class="font-bold text-gray-700 mt-6 mb-2 border-b pb-1">Daftar Pengeluaran Hari Ini</h3>
+            <div id="listPengeluaran" class="text-sm space-y-1 divide-y divide-gray-100 max-h-[30vh] overflow-y-auto">
+                <!-- Data pengeluaran -->
+            </div>
+        </div>
+
+        <!-- ================= Halaman Laporan & Grafik ================= -->
+        <div id="tab-laporan" class="hidden space-y-6">
+            
+            <!-- Filter Tanggal Periode -->
+            <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-wrap items-end gap-4">
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Mulai:</label>
+                    <input type="date" id="filterTanggalMulai" class="p-2 border border-orange-200 rounded text-sm focus:outline-orange-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Selesai:</label>
+                    <input type="date" id="filterTanggalSelesai" class="p-2 border border-orange-200 rounded text-sm focus:outline-orange-500">
+                </div>
+                <div class="flex gap-2">
+                    <button onclick="terapkanFilterTanggal()" class="px-4 py-2 bg-orange-600 text-white text-sm font-bold rounded hover:bg-orange-700 cursor-pointer transition">Cari Periode</button>
+                    <button onclick="resetFilterTanggal()" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-semibold rounded hover:bg-gray-300 cursor-pointer transition">Hari Ini</button>
+                </div>
+            </div>
+
+            <!-- Statistik Utama & Kalkulasi Laba Rugi -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
+                    <p class="text-xs text-gray-500 font-semibold uppercase">Omset Penjualan</p>
+                    <p class="text-2xl font-bold text-emerald-600" id="statOmset">Rp 0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
+                    <p class="text-xs text-gray-500 font-semibold uppercase">Total Pengeluaran</p>
+                    <p class="text-2xl font-bold text-red-500" id="statPengeluaran">Rp 0</p>
+                </div>
+                <div class="p-4 rounded-xl shadow border" id="boxLabaRugi">
+                    <p class="text-xs text-gray-500 font-semibold uppercase" id="labelLabaRugi">Laba / Rugi Bersih</p>
+                    <p class="text-2xl font-extrabold" id="statLabaRugi">Rp 0</p>
+                </div>
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
+                    <p class="text-xs text-gray-500 font-semibold uppercase">Jumlah Nota</p>
+                    <p class="text-2xl font-bold text-orange-500" id="statNota">0 Nota</p>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <!-- Grafik -->
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
+                    <h3 class="font-bold text-gray-700 mb-4">📊 Grafik Produk Terlaris Periode Ini</h3>
+                    <canvas id="chartProdukLaku" width="400" height="200"></canvas>
+                </div>
+                <!-- Riwayat Nota -->
+                <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
+                    <h3 class="font-bold text-gray-700 mb-4">📜 Riwayat Nota Transaksi</h3>
+                    <div id="riwayatNota" class="space-y-3 max-h-[50vh] overflow-y-auto">
+                        <!-- List nota -->
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Area Struk Nota Tersembunyi Khusus Printer Thermal -->
+    <div id="areaNota" class="hidden p-2 text-[12px] font-mono w-64 bg-white text-black leading-tight">
+        <div class="text-center font-bold text-[14px]">AYA GROUP</div>
+        <div class="text-center text-[10px]">Pusat Kuliner Terbaik</div>
+        <div class="text-center my-1">--------------------------------</div>
+        <div id="notaWaktu" class="text-[10px]"></div>
+        <div class="text-center my-1">--------------------------------</div>
+        <!-- Wadah Item Transaksi -->
+        <div id="notaItems" class="space-y-1"></div>
+        <div class="text-center my-1">--------------------------------</div>
+        <!-- Wadah Kalkulasi Total Pembayaran -->
+        <div id="notaTotal" class="space-y-0.5"></div>
+        <div class="text-center my-1">--------------------------------</div>
+        <div class="text-center mt-3 text-[10px] font-bold">Terima Kasih!<br>Selamat Menikmati Hidangan Kami</div>
+    </div>
+
+    <script>
+        // Database Menu Lengkap Terkategori
+        const databaseMenu = [
+            // --- KATEGORI: MAKANAN / TOPPING ---
+            { id: 4, nama: "Kornet", harga: 500, kategori: "makanan" },
+            { id: 5, nama: "Pentol", harga: 1000, kategori: "makanan" },
+            { id: 6, nama: "Sosis Kecil", harga: 1000, kategori: "makanan" },
+            { id: 7, nama: "Sosis Merah", harga: 1500, kategori: "makanan" },
+            { id: 8, nama: "Sosis Salju", harga: 2000, kategori: "makanan" },
+            { id: 9, nama: "Sosis Jumbo", harga: 3500, kategori: "makanan" },
+            { id: 10, nama: "Bintang", harga: 1000, kategori: "makanan" },
+            { id: 11, nama: "Tempura", harga: 1000, kategori: "makanan" },
+            { id: 12, nama: "Scallop", harga: 1000, kategori: "makanan" },
+            { id: 13, nama: "Bakso Ikan", harga: 1500, kategori: "makanan" },
+            { id: 14, nama: "Tahu Bakso", harga: 2000, kategori: "makanan" },
+            { id: 15, nama: "Dumpling Ayam", harga: 2000, kategori: "makanan" },
+            { id: 16, nama: "Dumpling Keju", harga: 2000, kategori: "makanan" },
+            { id: 17, nama: "Dumpling Spicy", harga: 2000, kategori: "makanan" },
+            { id: 18, nama: "Odeng", harga: 2000, kategori: "makanan" },
+            { id: 19, nama: "Cikua", harga: 1000, kategori: "makanan" },
+            { id: 20, nama: "Fish Roll", harga: 2000, kategori: "makanan" },
+            { id: 21, nama: "Crab Stik", harga: 2000, kategori: "makanan" },
+            { id: 22, nama: "Ekor Udang", harga: 2000, kategori: "makanan" },
+            { id: 23, nama: "Udang Gulung", harga: 2500, kategori: "makanan" },
+            { id: 24, nama: "Kembang Cumi", harga: 1000, kategori: "makanan" },
+            { id: 25, nama: "Pilus", harga: 1000, kategori: "makanan" },
+            { id: 26, nama: "Cuanki Lidah", harga: 2000, kategori: "makanan" },
+            { id: 27, nama: "Sosis Kering", harga: 2000, kategori: "makanan" },
+            { id: 28, nama: "K. Rafael", harga: 1000, kategori: "makanan" },
+            { id: 29, nama: "K. Orange", harga: 1000, kategori: "makanan" },
+            { id: 30, nama: "K. Warna", harga: 1000, kategori: "makanan" },
+            { id: 31, nama: "K. Bintang", harga: 1000, kategori: "makanan" },
+            { id: 32, nama: "K. Tangga", harga: 1000, kategori: "makanan" },
+            { id: 33, nama: "Enoki", harga: 1000, kategori: "makanan" },
+            { id: 34, nama: "Mie", harga: 1000, kategori: "makanan" },
+            { id: 35, nama: "Mie Tulang", harga: 8000, kategori: "makanan" },
+            { id: 36, nama: "Gado gado", harga: 10000, kategori: "makanan" },
+            { id: 37, nama: "Seblak All Varian", harga: 8000, kategori: "makanan" },
+            { id: 38, nama: "Nasi Kucing", harga: 5000, kategori: "makanan" },
+            { id: 39, nama: "Nasi Bakar", harga: 5000, kategori: "makanan" },
+            { id: 40, nama: "Sayap bakar", harga: 5000, kategori: "makanan" },
+            { id: 41, nama: "Kepala", harga: 3000, kategori: "makanan" },
+            { id: 42, nama: "Ceker", harga: 2000, kategori: "makanan" },
+            { id: 43, nama: "Tempe bacem", harga: 2000, kategori: "makanan" },
+            { id: 44, nama: "Tahu bacem", harga: 2000, kategori: "makanan" },
+            { id: 45, nama: "Telur puyuh bakar", harga: 3000, kategori: "makanan" },
+            { id: 46, nama: "Sate Usus", harga: 3000, kategori: "makanan" },
+            { id: 47, nama: "Sate Rempelo Ati", harga: 3000, kategori: "makanan" },
+            { id: 48, nama: "Sate frozen bakar", harga: 3000, kategori: "makanan" },
+            { id: 49, nama: "Sosis bakar", harga: 8000, kategori: "makanan" },
+            { id: 50, nama: "Cimol", harga: 3000, kategori: "makanan" },
+
+            // --- KATEGORI: MINUMAN DINGIN ---
+            { id: 1, nama: "Es Teh", harga: 4000, kategori: "dingin" },
+            { id: 2, nama: "Es Dawet", harga: 5000, kategori: "dingin" },
+            { id: 3, nama: "Es Teller", harga: 10000, kategori: "dingin" },
+            { id: 62, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
+            { id: 63, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
+            { id: 64, nama: "Milo ice", harga: 6000, kategori: "dingin" },
+            { id: 65, font: 6000, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
+            { id: 66, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
+            { id: 67, nama: "Bonteh Tarik", harga: 5000, kategori: "dingin" },
+            { id: 68, nama: "Uyu Ice", harga: 5000, kategori: "dingin" },
+            { id: 69, nama: "Beng Beng Ice", harga: 6000, kategori: "dingin" },
+            { id: 70, nama: "Chocolatos Ice", harga: 6000, kategori: "dingin" },
+            { id: 71, nama: "Kuku Bima Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 72, nama: "Extra Jos Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 73, nama: "Hemaviton Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 74, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
+            { id: 75, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
+
+            // --- KATEGORI: MINUMAN HANGAT / PANAS ---
+            { id: 51, nama: "Teh Hangat", harga: 4000, kategori: "panas" },
+            { id: 52, nama: "Kopi Hitam racik", harga: 5000, kategori: "panas" },
+            { id: 53, nama: "Top Coffee Gula aren panas", harga: 6000, kategori: "panas" },
+            { id: 54, nama: "Susu Jahe Panas", harga: 5000, kategori: "panas" },
+            { id: 55, nama: "Top Kopi Susu", harga: 5000, kategori: "panas" },
+            { id: 56, nama: "Kopi Susu Racik", harga: 6000, kategori: "panas" },
+            { id: 57, nama: "Kopi Kapal Api", harga: 5000, kategori: "panas" },
+            { id: 58, nama: "Top Kopi Hitam", harga: 5000, kategori: "panas" },
+            { id: 59, nama: "Kopi Brontoseno", harga: 5000, kategori: "panas" },
+            { id: 60, nama: "Kopi Luwak Hitam", harga: 5000, kategori: "panas" },
+            { id: 61, nama: "Luwak White Coffee", harga: 5000, kategori: "panas" }
+        ];
+
+        let keranjang = [];
+        let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
+        let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
+        let kategoriAktif = 'makanan';
+        let myChart = null;
+        
+        // State Filter Laporan
+        let tanggalMulaiTerpilih = null;
+        let tanggalSelesaiTerpilih = null;
+
+        function renderMenu() {
+            const container = document.getElementById('container-menu');
+            container.innerHTML = '';
+            const menuTerfilter = databaseMenu.filter(item => item.kategori === kategoriAktif);
+            menuTerfilter.forEach(item => {
+                container.innerHTML += `
+                    <button onclick="tambahItem(${item.id})" class="p-2 sm:p-3 bg-white hover:bg-orange-100 border-2 border-orange-200 rounded-xl text-left transition flex flex-col justify-between h-20 active:scale-95 shadow-sm cursor-pointer">
+                        <span class="font-bold text-[11px] sm:text-xs text-gray-700 uppercase tracking-tight line-clamp-2">${item.nama}</span>
+                        <span class="text-orange-600 font-extrabold text-xs sm:text-sm">Rp ${item.harga.toLocaleString('id-ID')}</span>
+                    </button>
+                `;
+            });
+        }
+
+        function filterKategori(kategori) {
+            kategoriAktif = kategori;
+            ['makanan', 'dingin', 'panas'].forEach(kat => {
+                const btn = document.getElementById('btn-kat-' + kat);
+                btn.className = "px-4 py-2 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap " + 
+                                (kat === kategori ? "bg-orange-500 text-white shadow" : "bg-gray-100 text-gray-700");
+            });
+            renderMenu();
+        }
+
+        function tambahItem(id) {
+            const produk = databaseMenu.find(p => p.id === id);
+            const ada = keranjang.find(k => k.id === id);
+            if (ada) {
+                ada.qty += 1;
+            } else {
+                keranjang.push({ ...produk, qty: 1, tanggalInput: new Date().toISOString().split('T')[0] });
+            }
+            updateKeranjang();
+        }
+
+        function ubahQty(id, delta) {
+            const ada = keranjang.find(k => k.id === id);
+            if(ada) {
+                ada.qty += delta;
+                if(ada.qty <= 0) {
+                    keranjang = keranjang.filter(k => k.id !== id);
+                }
+            }
+            updateKeranjang();
+        }
+
+        function updateKeranjang() {
+            const container = document.getElementById('tabelKeranjang');
+            if (keranjang.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">Belum ada item dipilih</p>';
+                document.getElementById('textTotal').innerText = 'Rp 0';
+                hitungKembalian();
+                return;
+            }
+
+            let html = '<div class="space-y-1.5">';
+            let total = 0;
+            keranjang.forEach(item => {
+                let subtotal = item.harga * item.qty;
+                total += subtotal;
+                html += `
+                    <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
+                        <div class="flex-1 min-w-0 pr-1">
+                            <p class="font-bold text-[11px] text-gray-800 uppercase truncate">${item.nama}</p>
+                            <p class="text-[10px] text-gray-500">Rp ${item.harga.toLocaleString('id-ID')}</p>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <button onclick="ubahQty(${item.id}, -1)" class="w-5 h-5 bg-gray-200 rounded font-bold text-xs flex items-center justify-center text-gray-600 hover:bg-gray-300 cursor-pointer">-</button>
+                            <span class="font-bold text-xs text-gray-800 px-1">${item.qty}</span>
+                            <button onclick="ubahQty(${item.id}, 1)" class="w-5 h-5 bg-orange-500 text-white rounded font-bold text-xs flex items-center justify-center hover:bg-orange-600 cursor-pointer">+</button>
+                        </div>
+                        <span class="font-bold text-xs text-gray-700 w-16 text-right">Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+            html += '</div>';
+            container.innerHTML = html;
+            document.getElementById('textTotal').innerText = 'Rp ' + total.toLocaleString('id-ID');
+            hitungKembalian();
+        }
+
+        function hitungKembalian() {
+            let total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
+            let kembalian = bayar - total;
+            document.getElementById('textKembalian').innerText = kembalian >= 0 ? 'Rp ' + kembalian.toLocaleString('id-ID') : 'Uang Kurang';
+        }
+
+        function bersihkanKeranjang() {
+            keranjang = [];
+            document.getElementById('inputBayar').value = '';
+            updateKeranjang();
+        }
+
+        function simpanTransaksi() {
+            if (keranjang.length === 0) { alert('Keranjang kosong!'); return false; }
+            let total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
+            if (bayar < total) { alert('Uang pembayaran Anda masih kurang!'); return false; }
+
+            let nota = {
+                id: 'NOTA-' + Date.now(),
+                waktu: new Date().toLocaleString('id-ID'),
+                tanggalISO: new Date().toISOString().split('T')[0], // Digunakan untuk filter laporan tanggal
+                items: [...keranjang],
+                total: total,
+                bayar: bayar,
+                kembalian: bayar - total
+            };
+
+            riwayatTransaksi.unshift(nota);
+            localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+            return true;
+        }
+
+        function tombolSimpanSaja() {
+            let sukses = simpanTransaksi();
+            if(sukses) {
+                alert('Sukses! Transaksi Berhasil Disimpan.');
+                bersihkanKeranjang();
+            }
+        }
+
+        // Fungsi Cetak Nota yang sudah diperbaiki alur delay renderingnya
+        function cetakNota() {
+            if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
+            let total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+            let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
+            if (bayar < total) return alert('Input uang bayar dengan benar sebelum mencetak!');
+
+            // 1. Isikan Data Waktu
+            document.getElementById('notaWaktu').innerHTML = `
+                <div>Waktu: ${new Date().toLocaleString('id-ID')}</div>
+                <div>No   : REG-${Date.now().toString().slice(-6)}</div>
+            `;
+            
+            // 2. Isikan Data Item Produk
+            let htmlItems = '';
+            keranjang.forEach(item => {
+                let subtotal = item.harga * item.qty;
+                htmlItems += `
+                    <div class="flex justify-between font-bold text-gray-900">
+                        <span>${item.nama.toUpperCase()}</span>
+                    </div>
+                    <div class="flex justify-between pl-2 text-[11px] text-gray-700">
+                        <span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span>
+                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+                    </div>
+                `;
+            });
+            document.getElementById('notaItems').innerHTML = htmlItems;
+            
+            // 3. Isikan Data Perhitungan Kas
+            document.getElementById('notaTotal').innerHTML = `
+                <div class="flex justify-between font-bold text-[13px] mt-1"><span>TOTAL :</span><span>Rp ${total.toLocaleString('id-ID')}</span></div>
+                <div class="flex justify-between text-gray-800"><span>BAYAR :</span><span>Rp ${bayar.toLocaleString('id-ID')}</span></div>
+                <div class="flex justify-between text-gray-800 font-bold"><span>KEMBALI:</span><span>Rp ${(bayar - total).toLocaleString('id-ID')}</span></div>
+            `;
+            
+            // 4. BERI TIMEOUT MICRO DETIK: Agar HTML Nota Terisi Sempurna Sebelum Layar Cetak Browser Muncul
+            setTimeout(() => {
+                window.print();
+
+                // 5. Simpan data & bersihkan keranjang setelah dialog cetak dipicu
+                let sukses = simpanTransaksi();
+                if(sukses) {
+                    bersihkanKeranjang();
+                }
+            }, 300);
+        }
+
+        function simpanPengeluaran() {
+            let nama = document.getElementById('namaPengeluaran').value;
+            let biaya = parseInt(document.getElementById('biayaPengeluaran').value) || 0;
+            if(!nama || biaya <= 0) return alert('Silakan masukkan nama barang & harga yang benar!');
+
+            pengeluaran.unshift({ 
+                nama, 
+                biaya, 
+                waktu: new Date().toLocaleString('id-ID'),
+                tanggalISO: new Date().toISOString().split('T')[0] 
+            });
+            localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
+            document.getElementById('namaPengeluaran').value = '';
+            document.getElementById('biayaPengeluaran').value = '';
+            renderPengeluaran();
+            alert('Pengeluaran berhasil dicatat!');
+        }
+
+        function renderPengeluaran() {
+            let container = document.getElementById('listPengeluaran');
+            container.innerHTML = pengeluaran.length === 0 ? '<p class="text-gray-400 py-2">Belum ada pengeluaran</p>' : '';
+            pengeluaran.forEach(p => {
+                container.innerHTML += `<div class="flex justify-between py-1.5 text-gray-700 border-b border-gray-100"><span>📌 ${p.nama} <br><small class="text-gray-400">${p.waktu}</small></span><span class="font-bold text-red-500">Rp ${p.biaya.toLocaleString('id-ID')}</span></div>`;
+            });
+        }
+
+        // ================= LOGIKA BARU: FILTER REKAP PERIODE TANGGAL =================
+        function terapkanFilterTanggal() {
+            let mulai = document.getElementById('filterTanggalMulai').value;
+            let selesai = document.getElementById('filterTanggalSelesai').value;
+            if(!mulai || !selesai) return alert('Silakan pilih rentang tanggal mulai dan selesai!');
+            
+            tanggalMulaiTerpilih = mulai;
+            tanggalSelesaiTerpilih = selesai;
+            updateLaporan();
+        }
+
+        function resetFilterTanggal() {
+            document.getElementById('filterTanggalMulai').value = '';
+            document.getElementById('filterTanggalSelesai').value = '';
+            tanggalMulaiTerpilih = null;
+            tanggalSelesaiTerpilih = null;
+            updateLaporan();
+        }
+
+        function updateLaporan() {
+            let hariIniISO = new Date().toISOString().split('T')[0];
+
+            // Filter data transaksi berdasarkan range tanggal / default Hari Ini
+            let transaksiTerfilter = riwayatTransaksi.filter(n => {
+                if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
+                    return n.tanggalISO >= tanggalMulaiTerpilih && n.tanggalISO <= tanggalSelesaiTerpilih;
+                }
+                return n.tanggalISO === hariIniISO; // Default perhari (Hari Ini)
+            });
+
+            // Filter data pengeluaran berdasarkan range tanggal / default Hari Ini
+            let pengeluaranTerfilter = pengeluaran.filter(p => {
+                if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
+                    return p.tanggalISO >= tanggalMulaiTerpilih && p.tanggalISO <= tanggalSelesaiTerpilih;
+                }
+                return p.tanggalISO === hariIniISO; // Default perhari (Hari Ini)
+            });
+
+            let omset = transaksiTerfilter.reduce((sum, n) => sum + n.total, 0);
+            let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
+            let labaRugiBersih = omset - totalBeban;
+
+            document.getElementById('statOmset').innerText = 'Rp ' + omset.toLocaleString('id-ID');
+            document.getElementById('statPengeluaran').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
+            document.getElementById('statNota').innerText = transaksiTerfilter.length + ' Nota';
+
+            const elBox = document.getElementById('boxLabaRugi');
+            const elLabel = document.getElementById('labelLabaRugi');
+            const elStat = document.getElementById('statLabaRugi');
+
+            if (labaRugiBersih >= 0) {
+                elLabel.innerText = "📈 LABA BERSIH";
+                elStat.innerText = 'Rp ' + labaRugiBersih.toLocaleString('id-ID');
+                elBox.className = "p-4 rounded-xl shadow border bg-emerald-50 border-emerald-200 text-emerald-700";
+            } else {
+                elLabel.innerText = "📉 RUGI BERSIH";
+                elStat.innerText = '- Rp ' + Math.abs(labaRugiBersih).toLocaleString('id-ID');
+                elBox.className = "p-4 rounded-xl shadow border bg-red-50 border-red-200 text-red-700";
+            }
+
+            // Render list nota riwayat terfilter
+            let containerNota = document.getElementById('riwayatNota');
+            containerNota.innerHTML = transaksiTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada riwayat transaksi pada periode ini</p>' : '';
+            transaksiTerfilter.forEach(n => {
+                let itemDetail = n.items.map(i => `${i.nama} (${i.qty}x)`).join(', ');
+                containerNota.innerHTML += `
+                    <div class="p-3 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
+                        <div class="flex justify-between font-bold text-gray-800 mb-1"><span>🧾 ${n.id}</span><span class="text-emerald-600">Rp ${n.total.toLocaleString('id-ID')}</span></div>
+                        <p class="mb-1 text-gray-400">🕒 ${n.waktu}</p>
+                        <p class="text-orange-700 font-medium">📦 ${itemDetail}</p>
+                    </div>
+                `;
+            });
+
+            // Hitung statistik produk terlaris terfilter
+            let produkCounts = {};
+            transaksiTerfilter.forEach(n => {
+                n.items.forEach(i => {
+                    produkCounts[i.nama] = (produkCounts[i.nama] || 0) + i.qty;
+                });
+            });
+
+            let urutProduk = Object.keys(produkCounts).map(name => ({ name, qty: produkCounts[name] })).sort((a,b) => b.qty - a.qty).slice(0, 5);
+
+            // Perbarui grafik
+            if (myChart) myChart.destroy();
+            const ctx = document.getElementById('chartProdukLaku').getContext('2d');
+            myChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: urutProduk.map(p => p.name),
+                    datasets: [{
+                        label: 'Total Terjual',
+                        data: urutProduk.map(p => p.qty),
+                        backgroundColor: '#ea580c',
+                        borderWidth: 0
+                    }]
+                },
+                options: { responsive: true, scales: { y: { beginAtZero: true } } }
+            });
+        }
+
+        function switchTab(tab) {
+            document.getElementById('tab-kasir').classList.add('hidden');
+            document.getElementById('tab-pengeluaran').classList.add('hidden');
+            document.getElementById('tab-laporan').classList.add('hidden');
+            document.getElementById('tab-' + tab).classList.remove('hidden');
+            if(tab === 'laporan') updateLaporan();
+        }
+
+        filterKategori('makanan');
+        renderPengeluaran();
+    </script>
+</body>
+</html>
