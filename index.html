@@ -4,9 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kasir AYA GROUP (Firebase Realtime & Multi-Payment)</title>
-    <!-- Tailwind CSS untuk tampilan modern & responsif -->
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
-    <!-- Chart.js untuk Grafik Rekap Produk Terlaris -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
         /* Desain struk belanja khusus cetak printer thermal */
@@ -26,7 +24,6 @@
 </head>
 <body class="bg-orange-50 font-sans text-gray-800 min-h-screen flex flex-col">
 
-    <!-- Header Utama Aplikasi -->
     <header class="bg-orange-600 text-white p-4 shadow-md sticky top-0 z-50 flex justify-between items-center flex-wrap gap-2">
         <h1 class="text-2xl font-bold tracking-wider">🍊 AYA GROUP KASIR</h1>
         <div class="space-x-1 sm:space-x-2">
@@ -38,15 +35,12 @@
 
     <div class="container mx-auto p-4 flex-1">
         
-        <!-- ================= Halaman Kasir ================= -->
         <div id="tab-kasir" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
-            <!-- Kolom Menu Pilihan (Kiri) -->
             <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col">
                 <h2 class="text-xl font-bold text-orange-600 mb-2">➕ Pilihan Menu & Topping</h2>
                 <p class="text-xs text-gray-500 mb-4">Pilih kategori di bawah, lalu klik item untuk menambah pesanan.</p>
                 
-                <!-- Filter Tombol Kategori Menu -->
                 <div class="flex gap-2 mb-4 border-b border-gray-200 pb-3 overflow-x-auto">
                     <button id="btn-kat-topping" onclick="filterKategori('topping')" class="px-4 py-2 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition cursor-pointer whitespace-nowrap">🍢 Topping / Krupuk Seblak</button>
                     <button id="btn-kat-makanan" onclick="filterKategori('makanan')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">🍲 Makanan / Bakaran</button>
@@ -55,13 +49,11 @@
                     <button id="btn-kat-jajanan" onclick="filterKategori('jajanan')" class="px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap">🚬 Jajanan / Rokok</button>
                 </div>
 
-                <!-- Container Grid Tombol Menu -->
                 <div class="max-h-[60vh] overflow-y-auto pr-2 flex-1">
                     <div class="grid grid-cols-2 sm:grid-cols-3 gap-2" id="container-menu"></div>
                 </div>
             </div>
 
-            <!-- Kolom Keranjang Belanja & Nota (Kanan) -->
             <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col justify-between h-fit lg:sticky lg:top-24">
                 <div>
                     <h2 class="text-xl font-bold text-orange-600 mb-4">📝 Detail Pesanan</h2>
@@ -70,10 +62,8 @@
                     </div>
                 </div>
 
-                <!-- Bagian Total & Pembayaran -->
                 <div class="bg-orange-100/50 p-4 rounded-lg mt-4 border border-orange-200">
                     
-                    <!-- Opsi Tipe Pelayanan (Dimakan / Dibungkus) -->
                     <div class="mb-3">
                         <label class="block text-xs font-bold text-gray-600 mb-1">Tipe Pesanan:</label>
                         <div class="grid grid-cols-2 gap-2 bg-white p-1 rounded-lg border border-orange-200">
@@ -86,7 +76,6 @@
                         </div>
                     </div>
 
-                    <!-- Input Manual Ongkos Kirim -->
                     <div class="mb-3">
                         <label class="block text-xs font-bold text-gray-600 mb-1">Ongkos Kirim (Rp):</label>
                         <input type="number" id="inputOngkir" oninput="updateKeranjang()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 text-xs font-bold" placeholder="0" min="0">
@@ -97,7 +86,6 @@
                         <span class="text-orange-600 text-xl" id="textTotal">Rp 0</span>
                     </div>
 
-                    <!-- Pilihan Metode Pembayaran -->
                     <div class="mb-3">
                         <label class="block text-xs font-bold text-gray-600 mb-1">Metode Pembayaran:</label>
                         <div class="grid grid-cols-2 gap-2">
@@ -124,7 +112,6 @@
             </div>
         </div>
 
-        <!-- ================= Halaman Pengeluaran ================= -->
         <div id="tab-pengeluaran" class="hidden bg-white p-6 rounded-xl shadow border border-orange-100 max-w-lg mx-auto">
             <h2 class="text-xl font-bold text-orange-600 mb-4">💸 Catat Pengeluaran Operasional</h2>
             <div class="space-y-3">
@@ -139,16 +126,26 @@
                 <button onclick="simpanPengeluaran()" class="w-full bg-orange-500 text-white font-bold py-2 rounded hover:bg-orange-600 transition cursor-pointer">➕ Tambah Pengeluaran</button>
             </div>
 
-            <h3 class="font-bold text-gray-700 mt-6 mb-2 border-b pb-1">Daftar Pengeluaran Hari Ini</h3>
-            <div id="listPengeluaran" class="text-sm space-y-1 divide-y divide-gray-100 max-h-[30vh] overflow-y-auto">
-                <!-- Data pengeluaran -->
+            <div class="mt-6 pt-4 border-t border-gray-200">
+                <label class="block text-xs font-bold text-gray-600 mb-1">Filter Rentang Tanggal Pengeluaran:</label>
+                <div class="grid grid-cols-2 gap-2 mb-2">
+                    <input type="date" id="pengeluaranTglMulai" class="p-2 border border-gray-300 rounded text-xs focus:outline-orange-500" onchange="renderPengeluaran()">
+                    <input type="date" id="pengeluaranTglSelesai" class="p-2 border border-gray-300 rounded text-xs focus:outline-orange-500" onchange="renderPengeluaran()">
+                </div>
+                <div class="flex justify-between items-center bg-red-50 p-2.5 rounded-lg border border-red-200 text-sm mb-2">
+                    <span class="font-bold text-gray-700">Total Periode Ini:</span>
+                    <span id="totalBiayaPengeluaranTerfilter" class="font-extrabold text-red-600">Rp 0</span>
+                </div>
+                <button onclick="resetFilterTanggalPengeluaran()" class="w-full py-1 bg-gray-200 text-gray-700 text-xs font-semibold rounded hover:bg-gray-300 transition cursor-pointer">Reset ke Hari Ini</button>
             </div>
+
+            <h3 class="font-bold text-gray-700 mt-4 mb-2 border-b pb-1">Daftar Pengeluaran</h3>
+            <div id="listPengeluaran" class="text-sm space-y-1 divide-y divide-gray-100 max-h-[30vh] overflow-y-auto">
+                </div>
         </div>
 
-        <!-- ================= Halaman Laporan & Grafik ================= -->
         <div id="tab-laporan" class="hidden space-y-6">
             
-            <!-- Filter Tanggal Periode -->
             <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-wrap items-end gap-4">
                 <div>
                     <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Mulai:</label>
@@ -164,9 +161,7 @@
                 </div>
             </div>
 
-            <!-- Statistik Utama & Pemisahan Tunai/QRIS -->
             <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
-                <!-- Total Omset Keseluruhan -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col justify-between">
                     <div>
                         <p class="text-xs text-gray-500 font-semibold uppercase">Total Omset</p>
@@ -177,17 +172,14 @@
                         <div class="flex justify-between"><span>📱 QRIS:</span><span class="font-bold" id="statOmsetQris">Rp 0</span></div>
                     </div>
                 </div>
-                <!-- Total Pengeluaran -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <p class="text-xs text-gray-500 font-semibold uppercase">Total Pengeluaran</p>
                     <p class="text-2xl font-bold text-red-500" id="statPengeluaran">Rp 0</p>
                 </div>
-                <!-- Laba Rugi -->
                 <div class="p-4 rounded-xl shadow border" id="boxLabaRugi">
                     <p class="text-xs text-gray-500 font-semibold uppercase" id="labelLabaRugi">Laba / Rugi Bersih</p>
                     <p class="text-2xl font-extrabold" id="statLabaRugi">Rp 0</p>
                 </div>
-                <!-- Jumlah Nota -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <p class="text-xs text-gray-500 font-semibold uppercase">Jumlah Nota</p>
                     <p class="text-2xl font-bold text-orange-500" id="statNota">0 Nota</p>
@@ -195,34 +187,28 @@
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                <!-- Grafik -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <h3 class="font-bold text-gray-700 mb-4">📊 Grafik Produk Terlaris Periode Ini</h3>
                     <canvas id="chartProdukLaku" width="400" height="200"></canvas>
                 </div>
-                <!-- Wadah Khusus Rekap Pengeluaran Detail -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <h3 class="font-bold text-gray-700 mb-4">💸 Rekap Pengeluaran Detail Periode Ini</h3>
                     <div id="rekapPengeluaranDetail" class="space-y-2 max-h-[50vh] overflow-y-auto">
-                        <!-- List detail item pengeluaran terfilter -->
-                    </div>
+                        </div>
                 </div>
             </div>
 
             <div class="grid grid-cols-1 gap-6">
-                <!-- Riwayat Nota -->
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <h3 class="font-bold text-gray-700 mb-4">📜 Riwayat Nota Transaksi</h3>
                     <div id="riwayatNota" class="space-y-3 max-h-[50vh] overflow-y-auto">
-                        <!-- List nota -->
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
 
     </div>
 
-    <!-- Area Struk Nota Tersembunyi Khusus Printer Thermal -->
     <div id="areaNota" class="hidden p-2 text-[12px] font-mono w-64 bg-white text-black leading-tight">
         <div class="text-center font-bold text-[14px]">AYA GROUP</div>
         <div class="text-center text-[10px]">Pusat Kuliner Terbaik</div>
@@ -231,16 +217,13 @@
         <div id="notaMetode" class="text-[11px] font-bold"></div>
         <div id="notaTipe" class="text-[11px]"></div>
         <div class="text-center my-1">--------------------------------</div>
-        <!-- Wadah Item Transaksi -->
         <div id="notaItems" class="space-y-1"></div>
         <div class="text-center my-1">--------------------------------</div>
-        <!-- Wadah Kalkulasi Total Pembayaran -->
         <div id="notaTotal" class="space-y-0.5"></div>
         <div class="text-center my-1">--------------------------------</div>
         <div class="text-center mt-3 text-[10px] font-bold">Terima Kasih!<br>Selamat Menikmati Hidangan Kami</div>
     </div>
 
-    <!-- Load Firebase SDK Versi Compat agar aman dan berjalan lancar -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
@@ -279,7 +262,7 @@
             { id: 110, nama: "Bakso Ikan", harga: 1500, kategori: "topping" },
             { id: 111, nama: "Tahu Bakso", harga: 1000, kategori: "topping" },
             { id: 112, nama: "Dumpling Ayam", harga: 2000, kategori: "topping" },
-            { id: 113, nama: "Dumpling Keju", harga: 2000, kategori: "topping" },
+            { id: 113, fontColor: "black", nama: "Dumpling Keju", harga: 2000, kategori: "topping" },
             { id: 114, nama: "Dumpling Spicy", harga: 2000, kategori: "topping" },
             { id: 115, nama: "Odeng", harga: 2000, kategori: "topping" },
             { id: 116, nama: "Cikua", harga: 1000, kategori: "topping" },
@@ -658,10 +641,33 @@
 
         function renderPengeluaran() {
             let container = document.getElementById('listPengeluaran');
-            container.innerHTML = pengeluaran.length === 0 ? '<p class="text-gray-400 py-2">Belum ada pengeluaran</p>' : '';
-            pengeluaran.forEach(p => {
+            let tglMulai = document.getElementById('pengeluaranTglMulai').value;
+            let tglSelesai = document.getElementById('pengeluaranTglSelesai').value;
+            let hariIniISO = new Date().toISOString().split('T')[0];
+
+            // Filter data pengeluaran berdasarkan tanggal input
+            let filteredPengeluaran = pengeluaran.filter(p => {
+                if (tglMulai && tglSelesai) {
+                    return p.tanggalISO >= tglMulai && p.tanggalISO <= tglSelesai;
+                }
+                return p.tanggalISO === hariIniISO;
+            });
+
+            // Hitung total pengeluaran terfilter
+            let totalBiaya = filteredPengeluaran.reduce((sum, p) => sum + p.biaya, 0);
+            document.getElementById('totalBiayaPengeluaranTerfilter').innerText = 'Rp ' + totalBiaya.toLocaleString('id-ID');
+
+            // Render isi daftar ke HTML
+            container.innerHTML = filteredPengeluaran.length === 0 ? '<p class="text-gray-400 py-2">Belum ada pengeluaran pada periode ini</p>' : '';
+            filteredPengeluaran.forEach(p => {
                 container.innerHTML += `<div class="flex justify-between py-1.5 text-gray-700 border-b border-gray-100"><span>📌 ${p.nama} <br><small class="text-gray-400">${p.waktu}</small></span><span class="font-bold text-red-500">Rp ${p.biaya.toLocaleString('id-ID')}</span></div>`;
             });
+        }
+
+        function resetFilterTanggalPengeluaran() {
+            document.getElementById('pengeluaranTglMulai').value = '';
+            document.getElementById('pengeluaranTglSelesai').value = '';
+            renderPengeluaran();
         }
 
         function terapkanFilterTanggal() {
@@ -800,6 +806,7 @@
             document.getElementById('tab-laporan').classList.add('hidden');
             document.getElementById('tab-' + tab).classList.remove('hidden');
             if(tab === 'laporan') updateLaporan();
+            if(tab === 'pengeluaran') renderPengeluaran();
         }
 
         // Set default kategori awal & muat menu saat halaman pertama kali dijalankan
