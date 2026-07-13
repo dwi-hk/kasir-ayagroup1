@@ -153,7 +153,7 @@
                 <div class="flex flex-wrap items-end gap-4">
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Mulai:</label>
-                        <input type="date" id="filterTanggalMulai" class="p-2 border border-orange-200 rounded text-sm focus:outline-outline-orange-500">
+                        <input type="date" id="filterTanggalMulai" class="p-2 border border-orange-200 rounded text-sm focus:outline-orange-500">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Selesai:</label>
@@ -184,7 +184,7 @@
                     <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] space-y-0.5 text-gray-600">
                         <div class="flex justify-between"><span>💵 Tunai:</span><span class="font-bold" id="statOmsetTunai">Rp 0</span></div>
                         <div class="flex justify-between"><span>📱 QRIS:</span><span class="font-bold" id="statOmsetQris">Rp 0</span></div>
-                        <div class="flex justify-between text-purple-600"><span>😋 Konsumsi Sendiri:</span><span class="font-bold" id="statOmsetKonsumsi">Rp 0</span></div>
+                        <div class="flex justify-between text-purple-600"><span>😋 Kosumsi Sendiri:</span><span class="font-bold" id="statOmsetKonsumsi">Rp 0</span></div>
                     </div>
                 </div>
                 
@@ -341,7 +341,7 @@
             { id: 305, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
             { id: 306, nama: "Milo ice", fontColor: "black", harga: 6000, kategori: "dingin" },
             { id: 307, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
-            { id: 308, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
+            { id: 308, fontColor: "black", nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
             { id: 309, nama: "Bonteh Tarik", fontColor: "black", harga: 5000, kategori: "dingin" },
             { id: 310, nama: "Uyu Ice", harga: 5000, kategori: "dingin" },
             { id: 311, nama: "Beng Beng Ice", harga: 6000, kategori: "dingin" },
@@ -392,14 +392,16 @@
         if (db) {
             db.ref('transaksi').on('value', (snapshot) => {
                 const data = snapshot.val();
-                riwayatTransaksi = data ? Object.values(data).reverse() : [];
+                // Mengurutkan riwayat transaksi berdasarkan properti id (timestamp) dari yang terbaru ke terlama
+                riwayatTransaksi = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
                 localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
                 if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
             });
 
             db.ref('pengeluaran').on('value', (snapshot) => {
                 const data = snapshot.val();
-                pengeluaran = data ? Object.values(data).reverse() : [];
+                // Mengurutkan pengeluaran berdasarkan properti id (timestamp) agar item pagi hari tetap stabil sesuai urutan waktu masuknya
+                pengeluaran = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
                 localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
                 renderPengeluaran();
                 if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
@@ -440,12 +442,11 @@
         }
 
         function setMetodePembayaran(metode) {
-            metodePembayaran = metode;
-            const btnTunai = document.getElementById('btn-bayar-tunai');
-            const btnQris = document.getElementById('btn-bayar-qris');
-            const btnKonsumsi = document.getElementById('btn-bayar-konsumsi');
-            const wrapBayar = document.getElementById('wrapperUangBayar');
-            const wrapKembali = document.getElementById('wrapperKembalian');
+            let btnTunai = document.getElementById('btn-bayar-tunai');
+            let btnQris = document.getElementById('btn-bayar-qris');
+            let btnKonsumsi = document.getElementById('btn-bayar-konsumsi');
+            let wrapBayar = document.getElementById('wrapperUangBayar');
+            let wrapKembali = document.getElementById('wrapperKembalian');
 
             // Reset Styles
             btnTunai.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
