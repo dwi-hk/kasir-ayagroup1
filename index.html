@@ -149,18 +149,29 @@
 
         <div id="tab-laporan" class="hidden space-y-6">
             
-            <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-wrap items-end gap-4">
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Mulai:</label>
-                    <input type="date" id="filterTanggalMulai" class="p-2 border border-orange-200 rounded text-sm focus:outline-orange-500">
+            <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-wrap items-end justify-between gap-4">
+                <div class="flex flex-wrap items-end gap-4">
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Mulai:</label>
+                        <input type="date" id="filterTanggalMulai" class="p-2 border border-orange-200 rounded text-sm focus:outline-outline-orange-500">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Selesai:</label>
+                        <input type="date" id="filterTanggalSelesai" class="p-2 border border-orange-200 rounded text-sm focus:outline-orange-500">
+                    </div>
+                    <div class="flex gap-2">
+                        <button onclick="terapkanFilterTanggal()" class="px-4 py-2 bg-orange-600 text-white text-sm font-bold rounded hover:bg-orange-700 cursor-pointer transition">Cari Periode</button>
+                        <button onclick="resetFilterTanggal()" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-semibold rounded hover:bg-gray-300 cursor-pointer transition">Hari Ini</button>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-xs font-bold text-gray-600 mb-1">Tanggal Selesai:</label>
-                    <input type="date" id="filterTanggalSelesai" class="p-2 border border-orange-200 rounded text-sm focus:outline-orange-500">
-                </div>
-                <div class="flex gap-2">
-                    <button onclick="terapkanFilterTanggal()" class="px-4 py-2 bg-orange-600 text-white text-sm font-bold rounded hover:bg-orange-700 cursor-pointer transition">Cari Periode</button>
-                    <button onclick="resetFilterTanggal()" class="px-4 py-2 bg-gray-200 text-gray-700 text-sm font-semibold rounded hover:bg-gray-300 cursor-pointer transition">Hari Ini</button>
+                
+                <!-- INPUT TAMBAHAN MODAL CASH RIIL -->
+                <div class="bg-orange-50 p-3 rounded-lg border border-orange-200 flex items-end gap-2 w-full sm:w-auto">
+                    <div>
+                        <label class="block text-[11px] font-bold text-orange-700 mb-1">➕ Tambah Modal Cash Riil (Uang Riil):</label>
+                        <input type="number" id="inputModalTambahan" class="p-2 bg-white border border-orange-300 rounded text-sm font-bold focus:outline-orange-500 w-full sm:w-48" placeholder="Masukkan Nominal">
+                    </div>
+                    <button onclick="simpanModalTambahan()" class="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded hover:bg-emerald-700 transition cursor-pointer">Simpan</button>
                 </div>
             </div>
 
@@ -183,7 +194,8 @@
                         <p class="text-2xl font-bold text-blue-600" id="statUangCash">Rp 0</p>
                     </div>
                     <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] space-y-0.5 text-gray-600">
-                        <div class="flex justify-between"><span>💰 Modal Awal:</span><span class="font-bold" id="statModal">Rp 70.000</span></div>
+                        <div class="flex justify-between"><span>💰 Modal Harian:</span><span class="font-bold" id="statModal">Rp 70.000</span></div>
+                        <div class="flex justify-between text-emerald-600"><span>💵 Modal Tambahan:</span><span class="font-bold" id="statModalTambahan">Rp 0</span></div>
                         <div class="flex justify-between"><span>➕ Kas Masuk (Tunai):</span><span class="font-bold" id="statCashMasuk">Rp 0</span></div>
                         <div class="flex justify-between"><span>➖ Pengeluaran Cash:</span><span class="font-bold" id="statBebanCash">Rp 0</span></div>
                     </div>
@@ -327,7 +339,7 @@
             { id: 303, nama: "Es Teller", harga: 10000, kategori: "dingin" },
             { id: 304, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
             { id: 305, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
-            { id: 306, nama: "Milo ice", harga: 6000, kategori: "dingin" },
+            { id: 306, nama: "Milo ice", fontColor: "black", harga: 6000, kategori: "dingin" },
             { id: 307, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
             { id: 308, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
             { id: 309, nama: "Bonteh Tarik", fontColor: "black", harga: 5000, kategori: "dingin" },
@@ -364,6 +376,7 @@
         let keranjang = [];
         let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
         let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
+        let modalTambahan = JSON.parse(localStorage.getItem('aya_modal_tambahan_v3')) || [];
         let kategoriAktif = 'topping';
         let metodePembayaran = 'TUNAI';
         let myChart = null;
@@ -389,6 +402,13 @@
                 pengeluaran = data ? Object.values(data).reverse() : [];
                 localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
                 renderPengeluaran();
+                if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
+            });
+
+            db.ref('modal_tambahan').on('value', (snapshot) => {
+                const data = snapshot.val();
+                modalTambahan = data ? Object.values(data) : [];
+                localStorage.setItem('aya_modal_tambahan_v3', JSON.stringify(modalTambahan));
                 if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
             });
         }
@@ -694,6 +714,31 @@
             });
         }
 
+        // Fungsi Simpan Modal Cash Riil Tambahan
+        function simpanModalTambahan() {
+            let nominal = parseInt(document.getElementById('inputModalTambahan').value) || 0;
+            if (nominal <= 0) return alert('Silakan masukkan nominal uang riil tambahan yang valid!');
+
+            let idModal = 'MODAL-' + Date.now();
+            let dataModal = {
+                id: idModal,
+                nominal: nominal,
+                waktu: new Date().toLocaleString('id-ID'),
+                tanggalISO: new Date().toISOString().split('T')[0]
+            };
+
+            if (db) {
+                db.ref('modal_tambahan/' + idModal).set(dataModal);
+            } else {
+                modalTambahan.push(dataModal);
+                localStorage.setItem('aya_modal_tambahan_v3', JSON.stringify(modalTambahan));
+                updateLaporan();
+            }
+
+            document.getElementById('inputModalTambahan').value = '';
+            alert('Uang riil tambahan berhasil disinkronkan ke modal!');
+        }
+
         // Fungsi Filter Tanggal Pengeluaran
         function terapkanFilterPengeluaran() {
             let mulai = document.getElementById('filterPengeluaranMulai').value;
@@ -754,6 +799,14 @@
                 return p.tanggalISO === hariIniISO;
             });
 
+            // Filter data Modal Tambahan berdasarkan tanggal terpilih
+            let modalTambahanTerfilter = modalTambahan.filter(m => {
+                if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
+                    return m.tanggalISO >= tanggalMulaiTerpilih && m.tanggalISO <= tanggalSelesaiTerpilih;
+                }
+                return m.tanggalISO === hariIniISO;
+            });
+
             let omsetTunai = 0;
             let omsetQris = 0;
             let omsetKonsumsi = 0;
@@ -775,13 +828,16 @@
             let jumlahHari = hitungHariUnik(transaksiTerfilter, pengeluaranTerfilter);
             let totalModalPeriode = UANG_MODAL_HARIAN * jumlahHari;
 
+            // Total Modal Tambahan (Uang Riil Tambahan)
+            let totalModalTambahan = modalTambahanTerfilter.reduce((sum, m) => sum + m.nominal, 0);
+
             let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
             
             // Laba Rugi Bersih murni dari penjualan bisnis nyata
             let labaRugiBersih = omsetBisnisTotal - totalBeban;
 
-            // Hitung Uang Kas Fisik Real: Modal Awal + Masuk Tunai - Pengeluaran Cash
-            let totalUangCashFisik = totalModalPeriode + omsetTunai - totalBeban;
+            // FORMULA SINKRONISASI BARU: Total Modal Harian + Uang Riil Tambahan + Masuk Tunai - Pengeluaran Cash
+            let totalUangCashFisik = totalModalPeriode + totalModalTambahan + omsetTunai - totalBeban;
 
             // Update Tampilan DOM Laporan
             document.getElementById('statOmset').innerText = 'Rp ' + omsetBisnisTotal.toLocaleString('id-ID');
@@ -794,6 +850,7 @@
             // Tab Informasi Uang Cash Riil
             document.getElementById('statUangCash').innerText = 'Rp ' + totalUangCashFisik.toLocaleString('id-ID');
             document.getElementById('statModal').innerText = 'Rp ' + totalModalPeriode.toLocaleString('id-ID');
+            document.getElementById('statModalTambahan').innerText = 'Rp ' + totalModalTambahan.toLocaleString('id-ID');
             document.getElementById('statCashMasuk').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
             document.getElementById('statBebanCash').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
 
