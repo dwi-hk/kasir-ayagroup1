@@ -165,10 +165,9 @@
                     </div>
                 </div>
                 
-                <!-- INPUT TAMBAHAN MODAL CASH RIIL -->
                 <div class="bg-orange-50 p-3 rounded-lg border border-orange-200 flex items-end gap-2 w-full sm:w-auto">
                     <div>
-                        <label class="block text-[11px] font-bold text-orange-700 mb-1">➕ Tambah Modal Cash Riil (Uang Riil):</label>
+                        <label class="block text-[11px] font-bold text-orange-700 mb-1">➕ Tambah Modal Cash Riil (Masuk Omzet):</label>
                         <input type="number" id="inputModalTambahan" class="p-2 bg-white border border-orange-300 rounded text-sm font-bold focus:outline-orange-500 w-full sm:w-48" placeholder="Masukkan Nominal">
                     </div>
                     <button onclick="simpanModalTambahan()" class="px-4 py-2 bg-emerald-600 text-white text-sm font-bold rounded hover:bg-emerald-700 transition cursor-pointer">Simpan</button>
@@ -184,7 +183,8 @@
                     <div class="mt-2 pt-2 border-t border-gray-100 text-[11px] space-y-0.5 text-gray-600">
                         <div class="flex justify-between"><span>💵 Tunai:</span><span class="font-bold" id="statOmsetTunai">Rp 0</span></div>
                         <div class="flex justify-between"><span>📱 QRIS:</span><span class="font-bold" id="statOmsetQris">Rp 0</span></div>
-                        <div class="flex justify-between text-purple-600"><span>😋 Kosumsi Sendiri:</span><span class="font-bold" id="statOmsetKonsumsi">Rp 0</span></div>
+                        <div class="flex justify-between text-teal-600"><span>➕ Tambahan Modal:</span><span class="font-bold" id="statOmsetModalMasuk">Rp 0</span></div>
+                        <div class="flex justify-between text-purple-600"><span>😋 Konsumsi Sendiri:</span><span class="font-bold" id="statOmsetKonsumsi">Rp 0</span></div>
                     </div>
                 </div>
                 
@@ -234,7 +234,7 @@
 
             <div class="grid grid-cols-1 gap-6">
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
-                    <h3 class="font-bold text-gray-700 mb-4">📜 Riwayat Nota Transaksi</h3>
+                    <h3 class="font-bold text-gray-700 mb-4">📜 Riwayat Nota Transaksi & Pemasukan</h3>
                     <div id="riwayatNota" class="space-y-3 max-h-[50vh] overflow-y-auto">
                         </div>
                 </div>
@@ -376,14 +376,12 @@
         let keranjang = [];
         let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
         let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
-        let modalTambahan = JSON.parse(localStorage.getItem('aya_modal_tambahan_v3')) || [];
         let kategoriAktif = 'topping';
         let metodePembayaran = 'TUNAI';
         let myChart = null;
         let tanggalMulaiTerpilih = null;
         let tanggalSelesaiTerpilih = null;
         
-        // Filter Tanggal Khusus Halaman Pengeluaran
         let tglPengeluaranMulai = null;
         let tglPengeluaranSelesai = null;
 
@@ -392,7 +390,6 @@
         if (db) {
             db.ref('transaksi').on('value', (snapshot) => {
                 const data = snapshot.val();
-                // Mengurutkan riwayat transaksi berdasarkan properti id (timestamp) dari yang terbaru ke terlama
                 riwayatTransaksi = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
                 localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
                 if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
@@ -400,17 +397,9 @@
 
             db.ref('pengeluaran').on('value', (snapshot) => {
                 const data = snapshot.val();
-                // Mengurutkan pengeluaran berdasarkan properti id (timestamp) agar item pagi hari tetap stabil sesuai urutan waktu masuknya
                 pengeluaran = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
                 localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
                 renderPengeluaran();
-                if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
-            });
-
-            db.ref('modal_tambahan').on('value', (snapshot) => {
-                const data = snapshot.val();
-                modalTambahan = data ? Object.values(data) : [];
-                localStorage.setItem('aya_modal_tambahan_v3', JSON.stringify(modalTambahan));
                 if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
             });
         }
@@ -448,7 +437,6 @@
             let wrapBayar = document.getElementById('wrapperUangBayar');
             let wrapKembali = document.getElementById('wrapperKembalian');
 
-            // Reset Styles
             btnTunai.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
             btnQris.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
             btnKonsumsi.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
@@ -493,7 +481,6 @@
 
         function hitungTotalKeseluruhan() {
             let totalBelanja = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
-            
             if (keranjang.length === 0) return 0;
 
             let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
@@ -628,13 +615,8 @@
             keranjang.forEach(item => {
                 let subtotal = item.harga * item.qty;
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900">
-                        <span>${item.nama.toUpperCase()}</span>
-                    </div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700">
-                        <span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span>
-                        <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
-                    </div>
+                    <div class="flex justify-between font-bold text-gray-900"><span>${item.nama.toUpperCase()}</span></div>
+                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
                 `;
             });
             
@@ -700,12 +682,10 @@
             let container = document.getElementById('listPengeluaran');
             let hariIniISO = new Date().toISOString().split('T')[0];
 
-            // Penyaringan data berdasarkan filter tanggal yang dipilih
             let pengeluaranTerfilter = pengeluaran.filter(p => {
                 if (tglPengeluaranMulai && tglPengeluaranSelesai) {
                     return p.tanggalISO >= tglPengeluaranMulai && p.tanggalISO <= tglPengeluaranSelesai;
                 }
-                // Secara default jika filter kosong, hanya tampilkan data hari ini saja
                 return p.tanggalISO === hariIniISO;
             });
 
@@ -715,48 +695,35 @@
             });
         }
 
-        // Fungsi Simpan Modal Cash Riil Tambahan
+        // PERBAIKAN UTAMA: Menyimpan modal tambahan langsung ke riwayat transaksi/pemasukan
         function simpanModalTambahan() {
             let nominal = parseInt(document.getElementById('inputModalTambahan').value) || 0;
-            if (nominal <= 0) return alert('Silakan masukkan nominal uang riil tambahan yang valid!');
+            if (nominal <= 0) return alert('Silakan masukkan nominal modal tambahan yang valid!');
 
-            let idModal = 'MODAL-' + Date.now();
-            let dataModal = {
-                id: idModal,
-                nominal: nominal,
+            let idNota = 'NOTA-MODAL-' + Date.now();
+            let dataModalSebagaiPemasukan = {
+                id: idNota,
                 waktu: new Date().toLocaleString('id-ID'),
-                tanggalISO: new Date().toISOString().split('T')[0]
+                tanggalISO: new Date().toISOString().split('T')[0],
+                items: [{ id: 999, nama: "TAMBAHAN MODAL CASH", harga: nominal, qty: 1, kategori: "modal" }],
+                total: nominal,
+                bayar: nominal,
+                kembalian: 0,
+                metodePembayaran: 'MODAL_MASUK',
+                tipePesanan: 'DINE_IN',
+                ongkir: 0
             };
 
             if (db) {
-                db.ref('modal_tambahan/' + idModal).set(dataModal);
+                db.ref('transaksi/' + idNota).set(dataModalSebagaiPemasukan);
             } else {
-                modalTambahan.push(dataModal);
-                localStorage.setItem('aya_modal_tambahan_v3', JSON.stringify(modalTambahan));
+                riwayatTransaksi.unshift(dataModalSebagaiPemasukan);
+                localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
                 updateLaporan();
             }
 
             document.getElementById('inputModalTambahan').value = '';
-            alert('Uang riil tambahan berhasil disinkronkan ke modal!');
-        }
-
-        // Fungsi Filter Tanggal Pengeluaran
-        function terapkanFilterPengeluaran() {
-            let mulai = document.getElementById('filterPengeluaranMulai').value;
-            let selesai = document.getElementById('filterPengeluaranSelesai').value;
-            if(!mulai || !selesai) return alert('Silakan pilih rentang tanggal mulai dan selesai!');
-            tglPengeluaranMulai = mulai;
-            tglPengeluaranSelesai = selesai;
-            renderPengeluaran();
-        }
-
-        // Fungsi Reset Filter Tanggal Pengeluaran (Kembali ke Hari Ini)
-        function resetFilterPengeluaran() {
-            document.getElementById('filterPengeluaranMulai').value = '';
-            document.getElementById('filterPengeluaranSelesai').value = '';
-            tglPengeluaranMulai = null;
-            tglPengeluaranSelesai = null;
-            renderPengeluaran();
+            alert('Tambahan modal berhasil disimpan langsung ke dalam Omzet & Pemasukan!');
         }
 
         function terapkanFilterTanggal() {
@@ -783,6 +750,23 @@
             return setHari.size || 1;
         }
 
+        function terapkanFilterPengeluaran() {
+            let mulai = document.getElementById('filterPengeluaranMulai').value;
+            let selesai = document.getElementById('filterPengeluaranSelesai').value;
+            if(!mulai || !selesai) return alert('Silakan pilih rentang tanggal mulai dan selesai!');
+            tglPengeluaranMulai = mulai;
+            tglPengeluaranSelesai = selesai;
+            renderPengeluaran();
+        }
+
+        function resetFilterPengeluaran() {
+            document.getElementById('filterPengeluaranMulai').value = '';
+            document.getElementById('filterPengeluaranSelesai').value = '';
+            tglPengeluaranMulai = null;
+            tglPengeluaranSelesai = null;
+            renderPengeluaran();
+        }
+
         function updateLaporan() {
             let hariIniISO = new Date().toISOString().split('T')[0];
 
@@ -800,58 +784,45 @@
                 return p.tanggalISO === hariIniISO;
             });
 
-            // Filter data Modal Tambahan berdasarkan tanggal terpilih
-            let modalTambahanTerfilter = modalTambahan.filter(m => {
-                if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
-                    return m.tanggalISO >= tanggalMulaiTerpilih && m.tanggalISO <= tanggalSelesaiTerpilih;
-                }
-                return m.tanggalISO === hariIniISO;
-            });
-
             let omsetTunai = 0;
             let omsetQris = 0;
             let omsetKonsumsi = 0;
+            let omsetModalMasuk = 0; // Penampung hitungan modal masuk
 
             transaksiTerfilter.forEach(n => {
                 if (n.metodePembayaran === 'QRIS') {
                     omsetQris += n.total;
                 } else if (n.metodePembayaran === 'KONSUMSI') {
                     omsetKonsumsi += n.total;
+                } else if (n.metodePembayaran === 'MODAL_MASUK') {
+                    omsetModalMasuk += n.total;
                 } else {
                     omsetTunai += n.total;
                 }
             });
 
-            // ATURAN BARU: Omset Bisnis hanya dihitung dari Tunai + QRIS (Konsumsi Sendiri dikeluarkan)
-            let omsetBisnisTotal = omsetTunai + omsetQris;
+            // SINKRONISASI BARU: Tambahan Modal ikut masuk menghitung total Omset/Pemasukan Bisnis
+            let omsetBisnisTotal = omsetTunai + omsetQris + omsetModalMasuk;
 
-            // Perhitungan Modal Harian Rp.70.000
             let jumlahHari = hitungHariUnik(transaksiTerfilter, pengeluaranTerfilter);
             let totalModalPeriode = UANG_MODAL_HARIAN * jumlahHari;
-
-            // Total Modal Tambahan (Uang Riil Tambahan)
-            let totalModalTambahan = modalTambahanTerfilter.reduce((sum, m) => sum + m.nominal, 0);
-
             let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
             
-            // Laba Rugi Bersih murni dari penjualan bisnis nyata
             let labaRugiBersih = omsetBisnisTotal - totalBeban;
+            let totalUangCashFisik = totalModalPeriode + omsetModalMasuk + omsetTunai - totalBeban;
 
-            // FORMULA SINKRONISASI BARU: Total Modal Harian + Uang Riil Tambahan + Masuk Tunai - Pengeluaran Cash
-            let totalUangCashFisik = totalModalPeriode + totalModalTambahan + omsetTunai - totalBeban;
-
-            // Update Tampilan DOM Laporan
+            // Update DOM element
             document.getElementById('statOmset').innerText = 'Rp ' + omsetBisnisTotal.toLocaleString('id-ID');
             document.getElementById('statOmsetTunai').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
             document.getElementById('statOmsetQris').innerText = 'Rp ' + omsetQris.toLocaleString('id-ID');
+            document.getElementById('statOmsetModalMasuk').innerText = 'Rp ' + omsetModalMasuk.toLocaleString('id-ID');
             document.getElementById('statOmsetKonsumsi').innerText = 'Rp ' + omsetKonsumsi.toLocaleString('id-ID');
             document.getElementById('statPengeluaran').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
-            document.getElementById('statNota').innerText = transaksiTerfilter.length + ' Nota';
+            document.getElementById('statNota').innerText = transaksiTerfilter.length + ' Item';
 
-            // Tab Informasi Uang Cash Riil
             document.getElementById('statUangCash').innerText = 'Rp ' + totalUangCashFisik.toLocaleString('id-ID');
             document.getElementById('statModal').innerText = 'Rp ' + totalModalPeriode.toLocaleString('id-ID');
-            document.getElementById('statModalTambahan').innerText = 'Rp ' + totalModalTambahan.toLocaleString('id-ID');
+            document.getElementById('statModalTambahan').innerText = 'Rp ' + omsetModalMasuk.toLocaleString('id-ID');
             document.getElementById('statCashMasuk').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
             document.getElementById('statBebanCash').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
 
@@ -860,7 +831,7 @@
             const elStat = document.getElementById('statLabaRugi');
 
             if (labaRugiBersih >= 0) {
-                elLabel.innerText = "📈 LABA BERSIH";
+                elLabel.innerText = "📈 LABA BERSIH (+MODAL)";
                 elStat.innerText = 'Rp ' + labaRugiBersih.toLocaleString('id-ID');
                 elBox.className = "p-4 rounded-xl shadow border bg-emerald-50 border-emerald-200 text-emerald-700 flex flex-col justify-between";
             } else {
@@ -869,7 +840,6 @@
                 elBox.className = "p-4 rounded-xl shadow border bg-red-50 border-red-200 text-red-700 flex flex-col justify-between";
             }
 
-            // Render Rekap Pengeluaran Detail
             let containerRekapPengeluaran = document.getElementById('rekapPengeluaranDetail');
             containerRekapPengeluaran.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada pengeluaran pada periode ini</p>' : '';
             pengeluaranTerfilter.forEach(p => {
@@ -885,16 +855,16 @@
             });
 
             let containerNota = document.getElementById('riwayatNota');
-            containerNota.innerHTML = transaksiTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada riwayat transaksi pada periode ini</p>' : '';
+            containerNota.innerHTML = transaksiTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada riwayat pada periode ini</p>' : '';
             
             transaksiTerfilter.forEach(n => {
                 let badgeColor = 'bg-green-100 text-green-800';
                 if (n.metodePembayaran === 'QRIS') badgeColor = 'bg-blue-100 text-blue-800';
                 if (n.metodePembayaran === 'KONSUMSI') badgeColor = 'bg-purple-100 text-purple-800';
+                if (n.metodePembayaran === 'MODAL_MASUK') badgeColor = 'bg-teal-600 text-white font-black';
                 
-                let badgeMetode = n.metodePembayaran || 'TUNAI';
+                let badgeMetode = n.metodePembayaran === 'MODAL_MASUK' ? 'MODAL MASUK' : (n.metodePembayaran || 'TUNAI');
 
-                // Membuat tabel detail item untuk setiap nota secara rapi dan dinamis
                 let detailItemsHtml = `
                     <div class="mt-3 border-t border-gray-200 pt-2 text-[11px] text-gray-700">
                         <table class="w-full text-left border-collapse">
@@ -923,7 +893,6 @@
                     });
                 }
 
-                // Tambahan baris untuk biaya Styrofoam jika dibungkus
                 if (n.tipePesanan === 'TAKE_AWAY') {
                     detailItemsHtml += `
                         <tr class="text-gray-500 italic">
@@ -935,7 +904,6 @@
                     `;
                 }
 
-                // Tambahan baris untuk manual Ongkos Kirim jika ada
                 if (n.ongkir > 0) {
                     detailItemsHtml += `
                         <tr class="text-gray-500 italic">
@@ -956,7 +924,7 @@
                 containerNota.innerHTML += `
                     <div class="p-4 bg-white rounded-xl border border-orange-100 shadow-sm text-xs text-gray-600">
                         <div class="flex justify-between items-center font-bold text-gray-800 mb-1">
-                            <span class="text-sm">🧾 ${n.id} <span class="ml-2 px-2 py-0.5 text-[10px] rounded-md font-extrabold ${badgeColor}">${badgeMetode}</span></span>
+                            <span class="text-sm">🧾 ${n.id} <span class="ml-2 px-2 py-0.5 text-[10px] rounded-md ${badgeColor}">${badgeMetode}</span></span>
                             <span class="text-emerald-600 text-base font-extrabold">Rp ${n.total.toLocaleString('id-ID')}</span>
                         </div>
                         <p class="text-gray-400 text-[10px]">📅 ${n.waktu}</p>
@@ -967,7 +935,9 @@
 
             let produkCounts = {};
             transaksiTerfilter.forEach(n => {
-                n.items.forEach(i => { produkCounts[i.nama] = (produkCounts[i.nama] || 0) + i.qty; });
+                if(n.metodePembayaran !== 'MODAL_MASUK') { // Jangan hitung produk fiktif modal
+                    n.items.forEach(i => { produkCounts[i.nama] = (produkCounts[i.nama] || 0) + i.qty; });
+                }
             });
             let urutProduk = Object.keys(produkCounts).map(name => ({ name, qty: produkCounts[name] })).sort((a,b) => b.qty - a.qty).slice(0, 5);
 
