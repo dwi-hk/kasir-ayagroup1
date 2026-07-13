@@ -71,7 +71,7 @@
                                 <input type="radio" name="tipePesanan" value="DINE_IN" checked onchange="updateKeranjang()" class="accent-orange-600"> Dine In
                             </label>
                             <label class="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold cursor-pointer text-gray-700">
-                                <input type="radio" name="tipePesanan" value="TAKE_AWAY" onchange="updateKeranjang()" class="accent-orange-600"> Dibungkus (+1k)
+                                <input type="radio" name="tipePesanan" value="TAKE_AWAY" onchange="updateKeranjang()" class="accent-orange-600"> Dibungkus (+1k/porsi)
                             </label>
                         </div>
                     </div>
@@ -262,7 +262,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-database-compat.js"></script>
 
     <script>
-        // 1. KONEKSIKAN KE FIREBASE ANDA
         const firebaseConfig = {
             apiKey: "AIzaSyCx0u4ka3lhjiPm84hI8U7v37GNusCvPaE",
             authDomain: "kasir-aya-group-e6fb4.firebaseapp.com",
@@ -273,7 +272,6 @@
             appId: "1:654765768336:web:7fb865aaf00e371de36215"
         };
 
-        // Inisialisasi Firebase secara aman dan terstruktur
         let db = null;
         try {
             firebase.initializeApp(firebaseConfig);
@@ -283,7 +281,6 @@
         }
 
         const databaseMenu = [
-            // === KATEGORI: TOPPING / KRUPUK SEBLAK ===
             { id: 101, nama: "Kornet", harga: 1000, kategori: "topping" },
             { id: 102, nama: "Pentol", harga: 1000, kategori: "topping" },
             { id: 103, nama: "Sosis Kecil", harga: 1000, kategori: "topping" },
@@ -316,7 +313,6 @@
             { id: 130, nama: "Jamur Enoki", harga: 1000, kategori: "topping" },
             { id: 131, nama: "Mie lombok", harga: 1000, kategori: "topping" },
 
-            // === KATEGORI: MAKANAN / SATE-SATEAN / BAKARAN ===
             { id: 201, nama: "Mie Tulang", harga: 8000, kategori: "makanan" },
             { id: 202, nama: "Gado gado", harga: 12000, kategori: "makanan" },
             { id: 203, nama: "Seblak All Varian", harga: 8000, kategori: "makanan" },
@@ -333,7 +329,6 @@
             { id: 214, nama: "Sate Lok Lok", harga: 3000, kategori: "makanan" },
             { id: 215, nama: "Sosis bakar", harga: 8000, kategori: "makanan" },
 
-            // === KATEGORI: MINUMAN DINGIN ===
             { id: 301, nama: "Es Teh", harga: 4000, kategori: "dingin" },
             { id: 302, nama: "Es Dawet", harga: 5000, kategori: "dingin" },
             { id: 303, nama: "Es Teller", harga: 10000, kategori: "dingin" },
@@ -352,7 +347,6 @@
             { id: 316, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
             { id: 317, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
 
-            // === KATEGORI: MINUMAN PANAS / HANGAT ===
             { id: 401, nama: "Teh Hangat", harga: 4000, kategori: "panas" },
             { id: 402, nama: "Kopi Hitam Racik", harga: 5000, kategori: "panas" },
             { id: 403, nama: "Top Coffee Gula aren panas", harga: 6000, kategori: "panas" },
@@ -365,7 +359,6 @@
             { id: 410, nama: "Kopi Luwak Hitam", harga: 5000, kategori: "panas" },
             { id: 411, nama: "Luwak White Coffee", harga: 5000, kategori: "panas" },
 
-            // === KATEGORI: JAJANAN / ROKOK KETENGAN ===
             { id: 501, nama: "Roti Nolanda", harga: 3000, kategori: "jajanan" },
             { id: 502, nama: "Roti Sisir Bareto", harga: 3000, kategori: "jajanan" },
             { id: 503, nama: "Batagor Ikan (1 porsi)", harga: 5000, kategori: "jajanan" },
@@ -387,7 +380,6 @@
 
         const UANG_MODAL_HARIAN = 70000;
 
-        // Fungsi pembantu untuk mengambil tanggal lokal (WIB/YMD) secara akurat agar tidak terpengaruh UTC
         function dapatkanTanggalLokal() {
             const d = new Date();
             const offset = d.getTimezoneOffset();
@@ -488,13 +480,27 @@
             updateKeranjang();
         }
 
+        // PERBAIKAN: Fungsi perkalian otomatis untuk menghitung total biaya bungkus berdasarkan QTY makanan utama
         function hitungTotalKeseluruhan() {
             let totalBelanja = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
             if (keranjang.length === 0) return 0;
 
             let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
             let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
-            let biayaStyrofoam = (tipePesanan === 'TAKE_AWAY') ? 1000 : 0;
+            
+            let biayaStyrofoam = 0;
+            if (tipePesanan === 'TAKE_AWAY') {
+                // Menghitung jumlah total porsi dari kategori makanan yang dipesan untuk dikali Rp 1.000
+                let totalPorsiMakanan = keranjang
+                    .filter(item => item.kategori === 'makanan')
+                    .reduce((sum, item) => sum + item.qty, 0);
+                
+                // Jika tidak ada makanan utama tetapi ada topping/jajanan, minimal dihitung 1 bungkus
+                if (totalPorsiMakanan === 0 && keranjang.length > 0) {
+                    totalPorsiMakanan = 1;
+                }
+                biayaStyrofoam = totalPorsiMakanan * 1000;
+            }
 
             return totalBelanja + ongkir + biayaStyrofoam;
         }
@@ -630,10 +636,15 @@
                 `;
             });
             
+            // PERBAIKAN: Menampilkan perkalian jumlah bungkus secara otomatis di struk thermal fisik
             if(tipePesanan === 'TAKE_AWAY') {
+                let totalPorsiMakanan = keranjang.filter(item => item.kategori === 'makanan').reduce((sum, item) => sum + item.qty, 0);
+                if (totalPorsiMakanan === 0 && keranjang.length > 0) totalPorsiMakanan = 1;
+                let subtotalBungkus = totalPorsiMakanan * 1000;
+
                 htmlItems += `
                     <div class="flex justify-between font-bold text-gray-900"><span>STEREOFOAM (BUNGKUS)</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  1 x Rp 1.000</span><span>Rp 1.000</span></div>
+                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${totalPorsiMakanan} x Rp 1.000</span><span>Rp ${subtotalBungkus.toLocaleString('id-ID')}</span></div>
                 `;
             }
             if(ongkir > 0) {
@@ -812,7 +823,6 @@
                 }
             });
 
-            // Tambahan Modal ikut masuk menghitung total Omset/Pemasukan Bisnis sesuai permintaan
             let omsetBisnisTotal = omsetTunai + omsetQris + omsetModalMasuk;
 
             let jumlahHari = hitungHariUnik(transaksiTerfilter, pengeluaranTerfilter);
@@ -822,7 +832,6 @@
             let labaRugiBersih = omsetBisnisTotal - totalBeban;
             let totalUangCashFisik = totalModalPeriode + omsetModalMasuk + omsetTunai - totalBeban;
 
-            // Update DOM element
             document.getElementById('statOmset').innerText = 'Rp ' + omsetBisnisTotal.toLocaleString('id-ID');
             document.getElementById('statOmsetTunai').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
             document.getElementById('statOmsetQris').innerText = 'Rp ' + omsetQris.toLocaleString('id-ID');
@@ -904,13 +913,18 @@
                     });
                 }
 
+                // PERBAIKAN: Menampilkan akumulasi biaya bungkus terhitung proporsional di Riwayat Nota
                 if (n.tipePesanan === 'TAKE_AWAY') {
+                    let totalPorsiMakanan = n.items ? n.items.filter(item => item.kategori === 'makanan').reduce((sum, item) => sum + item.qty, 0) : 0;
+                    if (totalPorsiMakanan === 0 && n.items && n.items.length > 0) totalPorsiMakanan = 1;
+                    let subtotalBungkus = totalPorsiMakanan * 1000;
+
                     detailItemsHtml += `
                         <tr class="text-gray-500 italic">
                             <td class="py-1">📦 Styrofoam (Bungkus)</td>
                             <td class="py-1 text-center">Rp 1.000</td>
-                            <td class="py-1 text-center">1x</td>
-                            <td class="py-1 text-right">Rp 1.000</td>
+                            <td class="py-1 text-center">${totalPorsiMakanan}x</td>
+                            <td class="py-1 text-right">Rp ${subtotalBungkus.toLocaleString('id-ID')}</td>
                         </tr>
                     `;
                 }
