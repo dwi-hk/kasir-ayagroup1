@@ -64,21 +64,15 @@
 
                 <div class="bg-orange-100/50 p-4 rounded-lg mt-4 border border-orange-200">
                     
-                    <div class="mb-3">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Tipe Pesanan:</label>
-                        <div class="grid grid-cols-2 gap-2 bg-white p-1 rounded-lg border border-orange-200">
-                            <label class="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold cursor-pointer text-gray-700">
-                                <input type="radio" name="tipePesanan" value="DINE_IN" checked onchange="updateKeranjang()" class="accent-orange-600"> Dine In
-                            </label>
-                            <label class="flex items-center justify-center gap-1.5 py-1.5 text-xs font-semibold cursor-pointer text-gray-700">
-                                <input type="radio" name="tipePesanan" value="TAKE_AWAY" onchange="updateKeranjang()" class="accent-orange-600"> Dibungkus (+1k/porsi)
-                            </label>
+                    <div class="grid grid-cols-2 gap-2 mb-3">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Jml Styrofoam (Mnl):</label>
+                            <input type="number" id="inputStyrofoam" oninput="updateKeranjang()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 text-xs font-bold" placeholder="0" min="0">
                         </div>
-                    </div>
-
-                    <div class="mb-3">
-                        <label class="block text-xs font-bold text-gray-600 mb-1">Ongkos Kirim (Rp):</label>
-                        <input type="number" id="inputOngkir" oninput="updateKeranjang()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 text-xs font-bold" placeholder="0" min="0">
+                        <div>
+                            <label class="block text-xs font-bold text-gray-600 mb-1">Ongkos Kirim (Rp):</label>
+                            <input type="number" id="inputOngkir" oninput="updateKeranjang()" class="w-full p-2 border border-orange-300 bg-white rounded focus:outline-orange-500 text-xs font-bold" placeholder="0" min="0">
+                        </div>
                     </div>
 
                     <div class="flex justify-between text-lg font-bold mb-2 text-gray-800">
@@ -249,7 +243,6 @@
         <div class="text-center my-1">--------------------------------</div>
         <div id="notaWaktu" class="text-[10px]"></div>
         <div id="notaMetode" class="text-[11px] font-bold"></div>
-        <div id="notaTipe" class="text-[11px]"></div>
         <div class="text-center my-1">--------------------------------</div>
         <div id="notaItems" class="space-y-1"></div>
         <div class="text-center my-1">--------------------------------</div>
@@ -291,13 +284,13 @@
             { id: 108, nama: "Tempura", harga: 1500, kategori: "topping" },
             { id: 109, nama: "Scallop", harga: 1000, kategori: "topping" },
             { id: 110, nama: "Bakso Ikan", harga: 1500, kategori: "topping" },
-            { id: 111, nama: "Tahu Bakso", fontColor: "black", harga: 1000, kategori: "topping" },
+            { id: 111, nama: "Tahu Bakso", harga: 1000, kategori: "topping" },
             { id: 112, nama: "Dumpling Ayam", harga: 2000, kategori: "topping" },
             { id: 113, nama: "Dumpling Keju", harga: 2000, kategori: "topping" },
             { id: 114, nama: "Dumpling Spicy", harga: 2000, kategori: "topping" },
             { id: 115, nama: "Odeng", harga: 2000, kategori: "topping" },
             { id: 116, nama: "Cikua", harga: 1000, kategori: "topping" },
-            { id: 117, fontColor: "black", nama: "Fish Roll", harga: 2000, kategori: "topping" },
+            { id: 117, nama: "Fish Roll", harga: 2000, kategori: "topping" },
             { id: 118, nama: "Crab Stik", harga: 2000, kategori: "topping" },
             { id: 119, nama: "Ekor Udang", harga: 2000, kategori: "topping" },
             { id: 120, nama: "Udang Gulung", harga: 2500, kategori: "topping" },
@@ -309,7 +302,7 @@
             { id: 126, nama: "Krupuk Orange", harga: 1000, kategori: "topping" },
             { id: 127, nama: "Krupuk Warna", harga: 1000, kategori: "topping" },
             { id: 128, nama: "Krupuk Bintang", harga: 1000, kategori: "topping" },
-            { id: 129, nama: "Krupuk Tangga", fontColor: "black", harga: 1000, kategori: "topping" },
+            { id: 129, nama: "Krupuk Tangga", harga: 1000, kategori: "topping" },
             { id: 130, nama: "Jamur Enoki", harga: 1000, kategori: "topping" },
             { id: 131, nama: "Mie lombok", harga: 1000, kategori: "topping" },
 
@@ -334,16 +327,16 @@
             { id: 303, nama: "Es Teller", harga: 10000, kategori: "dingin" },
             { id: 304, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
             { id: 305, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
-            { id: 306, nama: "Milo ice", fontColor: "black", harga: 6000, kategori: "dingin" },
-            { id: 307, fontColor: "black", nama: "Good Day ice", harga: 6000, kategori: "dingin" },
-            { id: 308, fontColor: "black", nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
-            { id: 309, nama: "Bonteh Tarik", fontColor: "black", harga: 5000, kategori: "dingin" },
+            { id: 306, nama: "Milo ice", harga: 6000, kategori: "dingin" },
+            { id: 307, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
+            { id: 308, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
+            { id: 309, nama: "Bonteh Tarik", harga: 5000, kategori: "dingin" },
             { id: 310, nama: "Uyu Ice", harga: 5000, kategori: "dingin" },
             { id: 311, nama: "Beng Beng Ice", harga: 6000, kategori: "dingin" },
             { id: 312, nama: "Chocolatos Ice", harga: 6000, kategori: "dingin" },
             { id: 313, nama: "Kuku Bima Susu Ice", harga: 7000, kategori: "dingin" },
-            { id: 314, nama: "Extra Jos Susu Ice", fontColor: "black", harga: 7000, kategori: "dingin" },
-            { id: 315, nama: "Hemaviton Susu Ice", fontColor: "black", harga: 7000, kategori: "dingin" },
+            { id: 314, nama: "Extra Jos Susu Ice", harga: 7000, kategori: "dingin" },
+            { id: 315, nama: "Hemaviton Susu Ice", harga: 7000, kategori: "dingin" },
             { id: 316, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
             { id: 317, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
 
@@ -485,19 +478,8 @@
             if (keranjang.length === 0) return 0;
 
             let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
-            let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
-            
-            let biayaStyrofoam = 0;
-            if (tipePesanan === 'TAKE_AWAY') {
-                let totalPorsiMakanan = keranjang
-                    .filter(item => item.kategori === 'makanan')
-                    .reduce((sum, item) => sum + item.qty, 0);
-                
-                if (totalPorsiMakanan === 0 && keranjang.length > 0) {
-                    totalPorsiMakanan = 1;
-                }
-                biayaStyrofoam = totalPorsiMakanan * 1000;
-            }
+            let qtyStyrofoam = parseInt(document.getElementById('inputStyrofoam').value) || 0;
+            let biayaStyrofoam = qtyStyrofoam * 1000;
 
             return totalBelanja + ongkir + biayaStyrofoam;
         }
@@ -552,7 +534,7 @@
             keranjang = [];
             document.getElementById('inputBayar').value = '';
             document.getElementById('inputOngkir').value = '';
-            document.querySelector('input[name="tipePesanan"][value="DINE_IN"]').checked = true;
+            document.getElementById('inputStyrofoam').value = '';
             setMetodePembayaran('TUNAI');
             updateKeranjang();
         }
@@ -560,8 +542,8 @@
         function simpanTransaksi() {
             if (keranjang.length === 0) { alert('Keranjang kosong!'); return false; }
             let total = hitungTotalKeseluruhan();
-            let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
             let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
+            let qtyStyrofoam = parseInt(document.getElementById('inputStyrofoam').value) || 0;
             
             let bayar = total;
             let kembalian = 0;
@@ -583,8 +565,8 @@
                 bayar: bayar,
                 kembalian: kembalian,
                 metodePembayaran: metodePembayaran,
-                tipePesanan: tipePesanan,
-                ongkir: ongkir
+                ongkir: ongkir,
+                qtyStyrofoam: qtyStyrofoam
             };
 
             if (db) {
@@ -608,8 +590,8 @@
         function cetakNota() {
             if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
             let total = hitungTotalKeseluruhan();
-            let tipePesanan = document.querySelector('input[name="tipePesanan"]:checked').value;
             let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
+            let qtyStyrofoam = parseInt(document.getElementById('inputStyrofoam').value) || 0;
             
             let bayar = total;
             if (metodePembayaran === 'TUNAI') {
@@ -622,7 +604,6 @@
                 <div>No   : REG-${Date.now().toString().slice(-6)}</div>
             `;
             document.getElementById('notaMetode').innerHTML = `METODE PEMBAYARAN: ${metodePembayaran}`;
-            document.getElementById('notaTipe').innerHTML = `TIPE PESANAN: ${tipePesanan === 'TAKE_AWAY' ? 'DIBUNGKUS' : 'DIMAKAN DI TEMPAT'}`;
             
             let htmlItems = '';
             keranjang.forEach(item => {
@@ -633,14 +614,11 @@
                 `;
             });
             
-            if(tipePesanan === 'TAKE_AWAY') {
-                let totalPorsiMakanan = keranjang.filter(item => item.kategori === 'makanan').reduce((sum, item) => sum + item.qty, 0);
-                if (totalPorsiMakanan === 0 && keranjang.length > 0) totalPorsiMakanan = 1;
-                let subtotalBungkus = totalPorsiMakanan * 1000;
-
+            if(qtyStyrofoam > 0) {
+                let subtotalStyrofoam = qtyStyrofoam * 1000;
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900"><span>STEREOFOAM (BUNGKUS)</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${totalPorsiMakanan} x Rp 1.000</span><span>Rp ${subtotalBungkus.toLocaleString('id-ID')}</span></div>
+                    <div class="flex justify-between font-bold text-gray-900"><span>STYROFOAM</span></div>
+                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${qtyStyrofoam} x Rp 1.000</span><span>Rp ${subtotalStyrofoam.toLocaleString('id-ID')}</span></div>
                 `;
             }
             if(ongkir > 0) {
@@ -707,7 +685,6 @@
                 return p.tanggalISO === hariIniISO;
             });
 
-            // Urutkan pengeluaran terbaru di atas
             pengeluaranTerfilter.sort((a, b) => b.id.localeCompare(a.id));
 
             container.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400 py-2 text-center text-xs">Tidak ada pengeluaran pada periode ini</p>' : '';
@@ -731,8 +708,8 @@
                 bayar: nominal,
                 kembalian: 0,
                 metodePembayaran: 'MODAL_MASUK',
-                tipePesanan: 'DINE_IN',
-                ongkir: 0
+                ongkir: 0,
+                qtyStyrofoam: 0
             };
 
             if (db) {
@@ -805,7 +782,6 @@
                 return p.tanggalISO === hariIniISO;
             });
 
-            // PERBAIKAN: Memastikan data riwayat transaksi diurutkan dari yang terbaru (ID nota terbesar) ke yang terlama
             transaksiTerfilter.sort((a, b) => b.id.localeCompare(a.id));
             pengeluaranTerfilter.sort((a, b) => b.id.localeCompare(a.id));
 
@@ -916,16 +892,13 @@
                     });
                 }
 
-                if (n.tipePesanan === 'TAKE_AWAY') {
-                    let totalPorsiMakanan = n.items ? n.items.filter(item => item.kategori === 'makanan').reduce((sum, item) => sum + item.qty, 0) : 0;
-                    if (totalPorsiMakanan === 0 && n.items && n.items.length > 0) totalPorsiMakanan = 1;
-                    let subtotalBungkus = totalPorsiMakanan * 1000;
-
+                if (n.qtyStyrofoam > 0) {
+                    let subtotalBungkus = n.qtyStyrofoam * 1000;
                     detailItemsHtml += `
                         <tr class="text-gray-500 italic">
-                            <td class="py-1">📦 Styrofoam (Bungkus)</td>
+                            <td class="py-1">📦 Styrofoam</td>
                             <td class="py-1 text-center">Rp 1.000</td>
-                            <td class="py-1 text-center">${totalPorsiMakanan}x</td>
+                            <td class="py-1 text-center">${n.qtyStyrofoam}x</td>
                             <td class="py-1 text-right">Rp ${subtotalBungkus.toLocaleString('id-ID')}</td>
                         </tr>
                     `;
