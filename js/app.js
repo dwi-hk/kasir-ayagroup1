@@ -1,48 +1,39 @@
 // --- KONFIGURASI DATA UTAMA ---
-// Format ID Transaksi: TRX-YYYYMMDD-XXXX
-// Format ID Pengeluaran: OUT-YYYYMMDD-XXXX
-// Format ID Produk: PXXXX (Tetap kompatibel dengan V2)
-
+// Menyesuaikan kategori produk dengan tombol di HTML (topping, makanan, dingin, panas, jajanan)
 const menuList = [
     // --- TOPPING ---
     { id: 'P0001', nama: 'Choco Crunch', kategori: 'topping', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=300&auto=format&fit=crop&q=60' },
     { id: 'P0002', nama: 'Keju Parut', kategori: 'topping', harga: 4000, stok: 99, gambar: 'https://images.unsplash.com/photo-1552763427-4d14eb306323?w=300&auto=format&fit=crop&q=60' },
     { id: 'P0003', nama: 'Almond Slice', kategori: 'topping', harga: 5000, stok: 99, gambar: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d96?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0004', nama: 'Oreo Crumb', kategori: 'topping', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1553456523-33c861de216c?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0005', nama: 'Milo Bubuk', kategori: 'topping', harga: 4000, stok: 99, gambar: 'https://images.unsplash.com/photo-1584949514123-47bbfae57b40?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0006', nama: 'Kacang Sangrai', kategori: 'topping', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1567894252391-7686b245dc71?w=300&auto=format&fit=crop&q=60' },
 
-    // --- BASE ---
-    { id: 'P0007', nama: 'Original Base Large', kategori: 'base', harga: 15000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0008', nama: 'Original Base Medium', kategori: 'base', harga: 12000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0009', nama: 'Pandan Base Large', kategori: 'base', harga: 17000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0010', nama: 'Pandan Base Medium', kategori: 'base', harga: 14000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0011', nama: 'Red Velvet Base Large', kategori: 'base', harga: 18000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0012', nama: 'Red Velvet Base Medium', kategori: 'base', harga: 15000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    // --- MAKANAN / BAKARAN ---
+    { id: 'P0007', nama: 'Seblak Original', kategori: 'makanan', harga: 15000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0008', nama: 'Bakaran Sosis Jumbo', kategori: 'makanan', harga: 12000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
 
-    // --- SAUCE ---
-    { id: 'P0013', nama: 'Cokelat Lumer', kategori: 'sauce', harga: 2000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0014', nama: 'Matcha Glaze', kategori: 'sauce', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0015', nama: 'Tiramisu Glaze', kategori: 'sauce', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0016', nama: 'Susu Kental Manis', kategori: 'sauce', harga: 1000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
-    { id: 'P0017', nama: 'Caramel Sauce', kategori: 'sauce', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' }
+    // --- MINUMAN DINGIN ---
+    { id: 'P0013', nama: 'Es Teh Manis', kategori: 'dingin', harga: 5000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0014', nama: 'Es Jeruk Peras', kategori: 'dingin', harga: 7000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+    
+    // --- MINUMAN HANGAT ---
+    { id: 'P0015', nama: 'Kopi Hitam Hangat', kategori: 'panas', harga: 5000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+
+    // --- JAJANAN / ROKOK ---
+    { id: 'P0016', nama: 'Keripik Kaca', kategori: 'jajanan', harga: 8000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' }
 ];
 
-// State Aplikasi Kompatibel V3 (Fallback ke LocalStorage jika Firebase Offline)
+// State Aplikasi
 let keranjang = [];
 let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
 let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
 let currentKategori = 'topping';
 let chartInstance = null;
 
-// Sinkronisasi Firebase Realtime Database
-if (db) {
+// Sinkronisasi Firebase Realtime Database (Gunakan pengecekan library yang aman)
+if (typeof db !== 'undefined') {
     db.ref('transaksi').on('value', (snapshot) => {
         const data = snapshot.val();
         riwayatTransaksi = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
         localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
-        
-        // Pebaikan: Selalu update laporan agar grafik & hitungan laba rugi langsung terisi otomatis
         updateLaporan();
     });
 
@@ -51,36 +42,31 @@ if (db) {
         pengeluaran = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
         localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
         renderPengeluaran();
-        
-        // Perbaikan: Sinkronisasi pembaruan laporan ketika ada data pengeluaran baru masuk
         updateLaporan();
     });
 }
 
 // --- FUNGSI MANAJEMEN TABS ---
 function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
-    document.getElementById(tabId).classList.remove('hidden');
+    // Menyembunyikan seluruh tab bawaan
+    document.getElementById('tab-kasir').classList.add('hidden');
+    document.getElementById('tab-pengeluaran').classList.add('hidden');
+    document.getElementById('tab-laporan').classList.add('hidden');
 
-    document.querySelectorAll('.tab-btn').forEach(btn => {
-        btn.classList.remove('text-pink-600', 'border-pink-600', 'border-b-2');
-        btn.classList.add('text-gray-500');
-    });
+    // Menampilkan tab tujuan
+    document.getElementById('tab-' + tabId).classList.remove('hidden');
 
-    const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick').includes(tabId));
-    if (activeBtn) {
-        activeBtn.classList.remove('text-gray-500');
-        activeBtn.classList.add('text-pink-600', 'border-pink-600', 'border-b-2');
+    if (tabId === 'kasir') {
+        renderMenu();
+        renderKeranjang();
     }
-
-    if (tabId === 'tab-riwayat') renderRiwayat();
-    if (tabId === 'tab-pengeluaran') renderPengeluaran();
-    if (tabId === 'tab-laporan') updateLaporan();
+    if (tabId === 'pengeluaran') renderPengeluaran();
+    if (tabId === 'laporan') updateLaporan();
 }
 
 // --- FUNGSI FORMAT MATA UANG & TANGGAL ---
 function formatRupiah(angka) {
-    return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+    return 'Rp ' + parseInt(angka || 0).toLocaleString('id-ID');
 }
 
 function generateCustomId(prefix) {
@@ -93,12 +79,28 @@ function generateCustomId(prefix) {
 // --- FUNGSI TRANSAKSI & KERANJANG ---
 function filterKategori(kat) {
     currentKategori = kat;
-    document.querySelectorAll('.kat-btn').forEach(btn => {
-        btn.classList.remove('bg-pink-600', 'text-white');
-        btn.classList.add('bg-gray-100', 'text-gray-700');
+    
+    // Sinkronisasi gaya aktif tombol HTML lama ke HTML baru
+    const mapBtnId = {
+        'topping': 'btn-kat-topping',
+        'makanan': 'btn-kat-makanan',
+        'dingin': 'btn-kat-dingin',
+        'panas': 'btn-kat-panas',
+        'jajanan': 'btn-kat-jajanan'
+    };
+
+    Object.values(mapBtnId).forEach(id => {
+        const el = document.getElementById(id);
+        if (el) {
+            el.className = "px-4 py-2 bg-gray-100 text-gray-700 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap";
+        }
     });
-    const activeKatBtn = Array.from(document.querySelectorAll('.kat-btn')).find(btn => btn.getAttribute('onclick').includes(kat));
-    if (activeKatBtn) activeKatBtn.classList.replace('bg-gray-100', 'text-gray-700', 'bg-pink-600', 'text-white');
+
+    const activeEl = document.getElementById(mapBtnId[kat]);
+    if (activeEl) {
+        activeEl.className = "px-4 py-2 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition cursor-pointer whitespace-nowrap";
+    }
+
     renderMenu();
 }
 
@@ -108,6 +110,12 @@ function renderMenu() {
     container.innerHTML = '';
 
     const filtered = menuList.filter(item => item.kategori === currentKategori);
+    
+    if(filtered.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center col-span-3 py-8 text-xs">Belum ada item untuk kategori ini.</p>';
+        return;
+    }
+
     filtered.forEach(item => {
         const itemKeranjang = keranjang.find(k => k.id === item.id);
         const qty = itemKeranjang ? itemKeranjang.qty : 0;
@@ -115,18 +123,18 @@ function renderMenu() {
         const card = document.createElement('div');
         card.className = 'bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between p-3';
         card.innerHTML = `
-            <img src="${item.gambar}" alt="${item.nama}" class="w-full h-32 object-cover rounded-lg mb-2">
+            <img src="${item.gambar}" alt="${item.nama}" class="w-full h-24 object-cover rounded-lg mb-2">
             <div>
-                <h4 class="font-bold text-gray-800 text-sm line-clamp-2">${item.nama}</h4>
-                <p class="text-pink-600 font-semibold text-sm mt-1">${formatRupiah(item.harga)}</p>
+                <h4 class="font-bold text-gray-800 text-xs line-clamp-2">${item.nama}</h4>
+                <p class="text-orange-600 font-semibold text-xs mt-1">${formatRupiah(item.harga)}</p>
             </div>
-            <div class="mt-3">
+            <div class="mt-2">
                 ${qty === 0 ? 
-                    `<button onclick="tambahKeKeranjang('${item.id}')" class="w-full bg-pink-50 text-pink-600 font-medium py-1.5 rounded-lg text-xs hover:bg-pink-100 transition">Tambah</button>` :
-                    `<div class="flex items-center justify-between bg-pink-50 rounded-lg p-1">
-                        <button onclick="kurangDariKeranjang('${item.id}')" class="w-7 h-7 bg-white text-pink-600 rounded-md font-bold text-xs shadow-sm flex items-center justify-center">-</button>
-                        <span class="text-pink-700 font-bold text-sm">${qty}</span>
-                        <button onclick="tambahKeKeranjang('${item.id}')" class="w-7 h-7 bg-white text-pink-600 rounded-md font-bold text-xs shadow-sm flex items-center justify-center">+</button>
+                    `<button onclick="tambahKeKeranjang('${item.id}')" class="w-full bg-orange-50 text-orange-600 font-bold py-1.5 rounded-lg text-[11px] hover:bg-orange-100 transition cursor-pointer">Tambah</button>` :
+                    `<div class="flex items-center justify-between bg-orange-50 rounded-lg p-1">
+                        <button onclick="kurangDariKeranjang('${item.id}')" class="w-6 h-6 bg-white text-orange-600 rounded font-bold text-xs shadow-sm flex items-center justify-center cursor-pointer">-</button>
+                        <span class="text-orange-700 font-bold text-xs">${qty}</span>
+                        <button onclick="tambahKeKeranjang('${item.id}')" class="w-6 h-6 bg-white text-orange-600 rounded font-bold text-xs shadow-sm flex items-center justify-center cursor-pointer">+</button>
                     </div>`
                 }
             </div>
@@ -157,33 +165,53 @@ function kurangDariKeranjang(id) {
     renderKeranjang();
 }
 
+// Sinkronisasi dengan input tambahan (Styrofoam, Ongkir) di HTML Baru
+function updateKeranjang() {
+    renderKeranjang();
+}
+
 function renderKeranjang() {
-    const container = document.getElementById('item-keranjang');
-    const totalBayarEl = document.getElementById('total-bayar');
+    const container = document.getElementById('tabelKeranjang'); // ID disesuaikan dengan HTML Baru
+    const textTotalEl = document.getElementById('textTotal');   // ID disesuaikan dengan HTML Baru
     if (!container) return;
 
+    if (keranjang.length === 0) {
+        container.innerHTML = '<p class="text-gray-400 text-center py-4 text-xs">Belum ada item dipilih</p>';
+        if (textTotalEl) textTotalEl.innerText = formatRupiah(0);
+        return;
+    }
+
     container.innerHTML = '';
-    let total = 0;
+    let totalProduk = 0;
 
     keranjang.forEach(item => {
-        total += item.harga * item.qty;
         const subtotal = item.harga * item.qty;
+        totalProduk += subtotal;
+        
         const row = document.createElement('div');
-        row.className = 'flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-100';
+        row.className = 'flex justify-between items-center bg-gray-50 p-2 rounded-lg border border-gray-100 mb-1.5';
         row.innerHTML = `
             <div>
                 <h5 class="font-bold text-gray-800 text-xs">${item.nama}</h5>
-                <p class="text-[11px] text-gray-500">${formatRupiah(item.harga)} x ${item.qty}</p>
+                <p class="text-[10px] text-gray-500">${formatRupiah(item.harga)} x ${item.qty}</p>
             </div>
             <div class="text-right">
                 <span class="font-bold text-gray-700 text-xs block">${formatRupiah(subtotal)}</span>
-                <button onclick="hapusItemKeranjang('${item.id}')" class="text-[10px] text-red-500 hover:underline mt-0.5">Hapus</button>
+                <button onclick="hapusItemKeranjang('${item.id}')" class="text-[10px] text-red-500 hover:underline">Hapus</button>
             </div>
         `;
         container.appendChild(row);
     });
 
-    if (totalBayarEl) totalBayarEl.innerText = formatRupiah(total);
+    // Menghitung Biaya Tambahan dari Form HTML
+    const styrofoamQty = parseInt(document.getElementById('inputStyrofoam').value) || 0;
+    const ongkirNominal = parseInt(document.getElementById('inputOngkir').value) || 0;
+    const totalBiayaStyrofoam = styrofoamQty * 2000; // Asumsi harga styrofoam Rp 2.000
+
+    const totalAkhir = totalProduk + totalBiayaStyrofoam + ongkirNominal;
+    if (textTotalEl) textTotalEl.innerText = formatRupiah(totalAkhir);
+    
+    hitungKembalian();
 }
 
 function hapusItemKeranjang(id) {
@@ -192,26 +220,56 @@ function hapusItemKeranjang(id) {
     renderKeranjang();
 }
 
-function prosesTransaksi() {
+function hitungKembalian() {
+    const totalText = document.getElementById('textTotal').innerText.replace(/[^0-9]/g, '');
+    const total = parseInt(totalText) || 0;
+    const uangBayar = parseInt(document.getElementById('inputBayar').value) || 0;
+    const kembalian = uangBayar - total;
+
+    const textKembalianEl = document.getElementById('textKembalian');
+    if (textKembalianEl) {
+        textKembalianEl.innerText = kembalian >= 0 ? formatRupiah(kembalian) : 'Uang Kurang';
+    }
+}
+
+// Mengatur kecocokan tipe pembayaran di antarmuka
+let metodePembayaranTerpilih = 'TUNAI';
+function setMetodePembayaran(metode) {
+    metodePembayaranTerpilih = metode;
+    ['TUNAI', 'QRIS', 'KONSUMSI'].forEach(m => {
+        const btn = document.getElementById(`btn-bayar-${m.toLowerCase()}`);
+        if(btn) {
+            btn.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
+        }
+    });
+    const activeBtn = document.getElementById(`btn-bayar-${metode.toLowerCase()}`);
+    if(activeBtn) {
+        activeBtn.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition";
+    }
+}
+
+function tombolSimpanSaja() {
     if (keranjang.length === 0) {
         alert('Keranjang belanja kosong!');
         return;
     }
 
-    const total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+    const totalText = document.getElementById('textTotal').innerText.replace(/[^0-9]/g, '');
+    const total = parseInt(totalText) || 0;
     const idTrx = generateCustomId('TRX');
     
     const transaksiBaru = {
         id: idTrx,
         tanggal: new Date().toISOString(),
         items: keranjang,
-        total: total
+        total: total,
+        metode: metodePembayaranTerpilih
     };
 
-    if (db) {
+    if (typeof db !== 'undefined') {
         db.ref('transaksi/' + idTrx).set(transaksiBaru)
             .then(() => resetSetelahTransaksi())
-            .catch(err => alert('Gagal menyimpan ke Firebase: ' + err.message));
+            .catch(err => alert('Gagal ke Firebase: ' + err.message));
     } else {
         riwayatTransaksi.unshift(transaksiBaru);
         localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
@@ -221,63 +279,29 @@ function prosesTransaksi() {
 
 function resetSetelahTransaksi() {
     keranjang = [];
+    document.getElementById('inputStyrofoam').value = '';
+    document.getElementById('inputOngkir').value = '';
+    document.getElementById('inputBayar').value = '';
     renderKeranjang();
     filterKategori(currentKategori);
     alert('Transaksi Berhasil Disimpan!');
 }
 
-// --- FUNGSI HALAMAN RIWAYAT ---
-function renderRiwayat() {
-    const container = document.getElementById('list-riwayat');
-    if (!container) return;
-    container.innerHTML = '';
+function bersihkanKeranjang() {
+    keranjang = [];
+    renderMenu();
+    renderKeranjang();
+}
 
-    if (riwayatTransaksi.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Belum ada riwayat transaksi.</p>';
+// --- PENGELUARAN ---
+function simpanPengeluaran() {
+    const nama = document.getElementById('namaPengeluaran').value;
+    const jumlah = parseInt(document.getElementById('biayaPengeluaran').value);
+    
+    if(!nama || !jumlah) {
+        alert('Lengkapi nama dan biaya pengeluaran!');
         return;
     }
-
-    riwayatTransaksi.forEach(trx => {
-        const itemText = trx.items.map(i => `${i.nama} (${i.qty})`).join(', ');
-        const tgl = new Date(trx.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
-        
-        const card = document.createElement('div');
-        card.className = 'bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-start';
-        card.innerHTML = `
-            <div class="space-y-1 max-w-[70%]">
-                <span class="text-[11px] font-mono bg-pink-50 text-pink-600 px-2 py-0.5 rounded-md font-bold">${trx.id}</span>
-                <p class="text-xs text-gray-400">${tgl}</p>
-                <p class="text-xs text-gray-700 font-medium line-clamp-2 mt-1">${itemText}</p>
-            </div>
-            <div class="text-right flex flex-col items-end space-y-2">
-                <span class="font-bold text-gray-800 text-sm">${formatRupiah(trx.total)}</span>
-                <button onclick="hapusTransaksi('${trx.id}')" class="text-[10px] text-red-500 hover:bg-red-50 px-2 py-1 rounded transition border border-red-100">Hapus</button>
-            </div>
-        `;
-        container.appendChild(card);
-    });
-}
-
-function hapusTransaksi(id) {
-    if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) return;
-    if (db) {
-        db.ref('transaksi/' + id).remove()
-            .catch(err => alert('Gagal menghapus data Firebase: ' + err.message));
-    } else {
-        riwayatTransaksi = riwayatTransaksi.filter(t => t.id !== id);
-        localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
-        renderRiwayat();
-        updateLaporan();
-    }
-}
-
-// --- FUNGSI HALAMAN PENGELUARAN ---
-function tambahPengeluaran(e) {
-    if(e) e.preventDefault();
-    const nama = document.getElementById('out-nama').value;
-    const jumlah = parseInt(document.getElementById('out-jumlah').value);
-    
-    if(!nama || !jumlah) return;
 
     const idOut = generateCustomId('OUT');
     const dataBaru = {
@@ -287,52 +311,54 @@ function tambahPengeluaran(e) {
         jumlah: jumlah
     };
 
-    if (db) {
+    if (typeof db !== 'undefined') {
         db.ref('pengeluaran/' + idOut).set(dataBaru)
             .then(() => {
-                document.getElementById('form-pengeluaran').reset();
+                document.getElementById('namaPengeluaran').value = '';
+                document.getElementById('biayaPengeluaran').value = '';
                 alert('Pengeluaran berhasil disimpan!');
             });
     } else {
         pengeluaran.unshift(dataBaru);
         localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
-        document.getElementById('form-pengeluaran').reset();
+        document.getElementById('namaPengeluaran').value = '';
+        document.getElementById('biayaPengeluaran').value = '';
         renderPengeluaran();
         updateLaporan();
     }
 }
 
 function renderPengeluaran() {
-    const container = document.getElementById('list-pengeluaran');
+    const container = document.getElementById('listPengeluaran'); // ID Sesuai HTML Baru
     if (!container) return;
     container.innerHTML = '';
 
     if (pengeluaran.length === 0) {
-        container.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Belum ada catatan pengeluaran.</p>';
+        container.innerHTML = '<p class="text-center text-gray-400 py-4 text-xs">Belum ada catatan pengeluaran.</p>';
         return;
     }
 
     pengeluaran.forEach(out => {
         const tgl = new Date(out.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
-        const card = document.createElement('div');
-        card.className = 'bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center';
-        card.innerHTML = `
+        const item = document.createElement('div');
+        item.className = 'flex justify-between items-center py-2 text-xs';
+        item.innerHTML = `
             <div>
-                <h5 class="font-bold text-gray-800 text-xs">${out.keterangan}</h5>
-                <p class="text-[11px] text-gray-400">${tgl} · <span class="font-mono text-[10px]">${out.id}</span></p>
+                <span class="font-bold text-gray-800">${out.keterangan}</span>
+                <p class="text-[10px] text-gray-400">${tgl} · ${out.id}</p>
             </div>
-            <div class="flex items-center space-x-3">
-                <span class="font-bold text-red-600 text-sm">-${formatRupiah(out.jumlah)}</span>
-                <button onclick="hapusPengeluaran('${out.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+            <div class="flex items-center space-x-2">
+                <span class="font-bold text-red-600">-${formatRupiah(out.jumlah)}</span>
+                <button onclick="hapusPengeluaran('${out.id}')" class="text-red-500 hover:underline text-[10px] cursor-pointer">Hapus</button>
             </div>
         `;
-        container.appendChild(card);
+        container.appendChild(item);
     });
 }
 
 function hapusPengeluaran(id) {
     if (!confirm('Hapus catatan pengeluaran ini?')) return;
-    if (db) {
+    if (typeof db !== 'undefined') {
         db.ref('pengeluaran/' + id).remove();
     } else {
         pengeluaran = pengeluaran.filter(o => o.id !== id);
@@ -342,71 +368,110 @@ function hapusPengeluaran(id) {
     }
 }
 
-// --- FUNGSI HALAMAN REKAP & GRAFIK (LAPORAN) ---
+// --- REKAP & LAPORAN ---
 function updateLaporan() {
     let omset = 0;
+    let omsetTunai = 0;
+    let omsetQris = 0;
+    let omsetPersonal = 0;
     let totalOut = 0;
     const produkTerjual = {};
 
-    // Hitung total omset dan pemetaan produk terjual
     riwayatTransaksi.forEach(trx => {
         omset += trx.total;
-        trx.items.forEach(item => {
-            produkTerjual[item.nama] = (produkTerjual[item.nama] || 0) + item.qty;
-        });
+        if (trx.metode === 'TUNAI' || !trx.metode) omsetTunai += trx.total;
+        if (trx.metode === 'QRIS') omsetQris += trx.total;
+        if (trx.metode === 'KONSUMSI') omsetPersonal += trx.total;
+
+        if (trx.items) {
+            trx.items.forEach(item => {
+                produkTerjual[item.nama] = (produkTerjual[item.nama] || 0) + item.qty;
+            });
+        }
     });
 
-    // Hitung total pengeluaran
     pengeluaran.forEach(out => {
         totalOut += out.jumlah;
     });
 
     const labaRugi = omset - totalOut;
 
-    // Masukkan data ke DOM HTML
-    const omsetEl = document.getElementById('rep-omset');
-    const pengeluaranEl = document.getElementById('rep-pengeluaran');
-    const labaEl = document.getElementById('rep-laba');
+    // Sinkronisasi ID Sesuai dengan Dokumen HTML Baru Anda
+    if (document.getElementById('statOmset')) document.getElementById('statOmset').innerText = formatRupiah(omset);
+    if (document.getElementById('statOmsetTunai')) document.getElementById('statOmsetTunai').innerText = formatRupiah(omsetTunai);
+    if (document.getElementById('statOmsetQris')) document.getElementById('statOmsetQris').innerText = formatRupiah(omsetQris);
+    if (document.getElementById('statOmsetKonsumsi')) document.getElementById('statOmsetKonsumsi').innerText = formatRupiah(omsetPersonal);
+    if (document.getElementById('statPengeluaran')) document.getElementById('statPengeluaran').innerText = formatRupiah(totalOut);
+    if (document.getElementById('statNota')) document.getElementById('statNota').innerText = riwayatTransaksi.length + ' Nota';
+    
+    const cashRiil = 70000 + omsetTunai - totalOut; // Modal Harian Rp 70.000 + Tunai - Pengeluaran
+    if (document.getElementById('statUangCash')) document.getElementById('statUangCash').innerText = formatRupiah(cashRiil);
+    if (document.getElementById('statCashMasuk')) document.getElementById('statCashMasuk').innerText = formatRupiah(omsetTunai);
+    if (document.getElementById('statBebanCash')) document.getElementById('statBebanCash').innerText = formatRupiah(totalOut);
 
-    if (omsetEl) omsetEl.innerText = formatRupiah(omset);
-    if (pengeluaranEl) pengeluaranEl.innerText = formatRupiah(totalOut);
-    if (labaEl) {
-        labaEl.innerText = formatRupiah(labaRugi);
+    const statLabaEl = document.getElementById('statLabaRugi');
+    const boxLabaRugi = document.getElementById('boxLabaRugi');
+    if (statLabaEl) {
+        statLabaEl.innerText = formatRupiah(labaRugi);
         if (labaRugi >= 0) {
-            labaEl.className = "text-xl font-bold text-emerald-600";
+            boxLabaRugi.className = "p-4 rounded-xl shadow border border-orange-100 bg-emerald-50 text-emerald-900 flex flex-col justify-between";
+            statLabaEl.className = "text-2xl font-extrabold text-emerald-600";
         } else {
-            labaEl.className = "text-xl font-bold text-red-600";
+            boxLabaRugi.className = "p-4 rounded-xl shadow border border-orange-100 bg-red-50 text-red-900 flex flex-col justify-between";
+            statLabaEl.className = "text-2xl font-extrabold text-red-600";
         }
     }
 
-    // Pembuatan Grafik Chart.js
+    // Render Riwayat Nota Ringkas di Laporan
+    const riwayatNotaContainer = document.getElementById('riwayatNota');
+    if (riwayatNotaContainer) {
+        riwayatNotaContainer.innerHTML = '';
+        if(riwayatTransaksi.length === 0) {
+            riwayatNotaContainer.innerHTML = '<p class="text-gray-400 text-center text-xs py-4">Belum ada transaksi</p>';
+        } else {
+            riwayatTransaksi.forEach(trx => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between items-center text-xs border-b pb-2';
+                div.innerHTML = `
+                    <div>
+                        <span class="font-mono font-bold">${trx.id}</span> [${trx.metode || 'TUNAI'}]
+                        <p class="text-[10px] text-gray-400">${new Date(trx.tanggal).toLocaleDateString('id-ID')}</p>
+                    </div>
+                    <div class="text-right">
+                        <span class="font-bold">${formatRupiah(trx.total)}</span>
+                        <button onclick="hapusTransaksi('${trx.id}')" class="text-red-500 block text-[10px] ml-auto cursor-pointer">Hapus</button>
+                    </div>
+                `;
+                riwayatNotaContainer.appendChild(div);
+            });
+        }
+    }
+
+    // Render Detail Pengeluaran Periode Ini
+    const rekapPengeluaranDetail = document.getElementById('rekapPengeluaranDetail');
+    if (rekapPengeluaranDetail) {
+        rekapPengeluaranDetail.innerHTML = '';
+        if(pengeluaran.length === 0) {
+            rekapPengeluaranDetail.innerHTML = '<p class="text-gray-400 text-center text-xs py-4">Belum ada pengeluaran</p>';
+        } else {
+            pengeluaran.forEach(out => {
+                const div = document.createElement('div');
+                div.className = 'flex justify-between text-xs border-b pb-1';
+                div.innerHTML = `<span>${out.keterangan}</span><span class="text-red-600 font-bold">-${formatRupiah(out.jumlah)}</span>`;
+                rekapPengeluaranDetail.appendChild(div);
+            });
+        }
+    }
+
+    // --- CHART.JS ---
     const ctx = document.getElementById('chartProdukLaku');
     if (!ctx) return;
 
-    const sortedProduk = Object.entries(produkTerjual)
-        .sort((a, b) => b[1] - a[1])
-        .slice(0, 5);
-
+    const sortedProduk = Object.entries(produkTerjual).sort((a, b) => b[1] - a[1]).slice(0, 5);
     const labels = sortedProduk.map(p => p[0]);
     const dataValues = sortedProduk.map(p => p[1]);
 
-    if (chartInstance) {
-        chartInstance.destroy();
-    }
-
-    if(labels.length === 0) {
-        ctx.style.display = 'none';
-        const nodata = document.getElementById('no-chart-data') || document.createElement('p');
-        nodata.id = 'no-chart-data';
-        nodata.className = 'text-center text-gray-400 text-xs py-8';
-        nodata.innerText = 'Belum ada data penjualan untuk dibuat grafik.';
-        if(!document.getElementById('no-chart-data')) ctx.parentNode.appendChild(nodata);
-        return;
-    } else {
-        ctx.style.display = 'block';
-        const nodata = document.getElementById('no-chart-data');
-        if(nodata) nodata.remove();
-    }
+    if (chartInstance) chartInstance.destroy();
 
     chartInstance = new Chart(ctx, {
         type: 'bar',
@@ -415,35 +480,32 @@ function updateLaporan() {
             datasets: [{
                 label: 'Qty Terjual',
                 data: dataValues,
-                backgroundColor: 'rgba(219, 39, 119, 0.2)',
-                borderColor: 'rgba(219, 39, 119, 1)',
+                backgroundColor: 'rgba(234, 88, 12, 0.2)',
+                borderColor: 'rgba(234, 88, 12, 1)',
                 borderWidth: 1.5,
-                borderRadius: 6
+                borderRadius: 4
             }]
         },
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            scales: {
-                y: {
-                    beginAtZero: true,
-                    ticks: { stepSize: 1, color: '#9CA3AF', font: { size: 10 } },
-                    grid: { color: '#F3F4F6' }
-                },
-                x: {
-                    ticks: { color: '#4B5563', font: { size: 10 } },
-                    grid: { display: false }
-                }
-            },
-            plugins: {
-                legend: { display: false }
-            }
+            plugins: { legend: { display: false } }
         }
     });
 }
 
-// --- PEMICU INISIALISASI PERTAMA KALI WEB DIMUAT ---
-// Perbaikan: Memastikan DOM & database siap sebelum me-render data ke antarmuka aplikasi
+function hapusTransaksi(id) {
+    if (!confirm('Hapus transaksi ini?')) return;
+    if (typeof db !== 'undefined') {
+        db.ref('transaksi/' + id).remove();
+    } else {
+        riwayatTransaksi = riwayatTransaksi.filter(t => t.id !== id);
+        localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+        updateLaporan();
+    }
+}
+
+// Inisialisasi Awal Saat Halaman Selesai Dimuat
 document.addEventListener("DOMContentLoaded", () => {
     filterKategori('topping');
     renderPengeluaran();
