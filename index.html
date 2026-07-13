@@ -291,7 +291,7 @@
             { id: 108, nama: "Tempura", harga: 1500, kategori: "topping" },
             { id: 109, nama: "Scallop", harga: 1000, kategori: "topping" },
             { id: 110, nama: "Bakso Ikan", harga: 1500, kategori: "topping" },
-            { id: 111, nama: "Tahu Bakso", harga: 1000, kategori: "topping" },
+            { id: 111, nama: "Tahu Bakso", fontColor: "black", harga: 1000, kategori: "topping" },
             { id: 112, nama: "Dumpling Ayam", harga: 2000, kategori: "topping" },
             { id: 113, nama: "Dumpling Keju", harga: 2000, kategori: "topping" },
             { id: 114, nama: "Dumpling Spicy", harga: 2000, kategori: "topping" },
@@ -707,6 +707,9 @@
                 return p.tanggalISO === hariIniISO;
             });
 
+            // Urutkan pengeluaran terbaru di atas
+            pengeluaranTerfilter.sort((a, b) => b.id.localeCompare(a.id));
+
             container.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400 py-2 text-center text-xs">Tidak ada pengeluaran pada periode ini</p>' : '';
             pengeluaranTerfilter.forEach(p => {
                 container.innerHTML += `<div class="flex justify-between py-1.5 text-gray-700 border-b border-gray-100"><span>📌 ${p.nama} <br><small class="text-gray-400">${p.waktu}</small></span><span class="font-bold text-red-500">Rp ${p.biaya.toLocaleString('id-ID')}</span></div>`;
@@ -785,7 +788,6 @@
             renderPengeluaran();
         }
 
-        // PERBAIKAN LOGIKA: Pemisahan murni transaksi penjualan dan tambahan modal harian pada Total Omset
         function updateLaporan() {
             let hariIniISO = dapatkanTanggalLokal();
 
@@ -803,6 +805,10 @@
                 return p.tanggalISO === hariIniISO;
             });
 
+            // PERBAIKAN: Memastikan data riwayat transaksi diurutkan dari yang terbaru (ID nota terbesar) ke yang terlama
+            transaksiTerfilter.sort((a, b) => b.id.localeCompare(a.id));
+            pengeluaranTerfilter.sort((a, b) => b.id.localeCompare(a.id));
+
             let omsetTunai = 0;
             let omsetQris = 0;
             let omsetKonsumsi = 0;
@@ -814,23 +820,19 @@
                 } else if (n.metodePembayaran === 'KONSUMSI') {
                     omsetKonsumsi += n.total;
                 } else if (n.metodePembayaran === 'MODAL_MASUK') {
-                    omsetModalMasuk += n.total; // Ini dicatat terpisah
+                    omsetModalMasuk += n.total;
                 } else {
                     omsetTunai += n.total;
                 }
             });
 
-            // PERBAIKAN: Total Omset Bisnis hanya akumulasi murni penjualan (Tunai + QRIS)
             let omsetBisnisTotal = omsetTunai + omsetQris;
 
             let jumlahHari = hitungHariUnik(transaksiTerfilter, pengeluaranTerfilter);
             let totalModalPeriode = UANG_MODAL_HARIAN * jumlahHari;
             let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
             
-            // Laba bersih dihitung dari Omset Penjualan dikurangi biaya pengeluaran operasional
             let labaRugiBersih = omsetBisnisTotal - totalBeban;
-            
-            // Total Uang Cash fisik di dompet kasir/rekening
             let totalUangCashFisik = totalModalPeriode + omsetModalMasuk + omsetTunai - totalBeban;
 
             document.getElementById('statOmset').innerText = 'Rp ' + omsetBisnisTotal.toLocaleString('id-ID');
