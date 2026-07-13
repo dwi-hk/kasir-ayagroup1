@@ -1,131 +1,39 @@
-// Konfigurasi Firebase Realtime Database Anda
-const firebaseConfig = {
-    apiKey: "AIzaSyCx0u4ka3lhjiPm84hI8U7v37GNusCvPaE",
-    authDomain: "kasir-aya-group-e6fb4.firebaseapp.com",
-    databaseURL: "https://kasir-aya-group-e6fb4-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "kasir-aya-group-e6fb4",
-    storageBucket: "kasir-aya-group-e6fb4.firebasestorage.app",
-    messagingSenderId: "654765768336",
-    appId: "1:654765768336:web:7fb865aaf00e371de36215"
-};
+// --- KONFIGURASI DATA UTAMA ---
+// Format ID Transaksi: TRX-YYYYMMDD-XXXX
+// Format ID Pengeluaran: OUT-YYYYMMDD-XXXX
+// Format ID Produk: PXXXX (Tetap kompatibel dengan V2)
 
-let db = null;
-try {
-    firebase.initializeApp(firebaseConfig);
-    db = firebase.database();
-} catch(e) { 
-    console.error("Firebase tidak dapat terhubung atau diinisialisasi", e); 
-}
+const menuList = [
+    // --- TOPPING ---
+    { id: 'P0001', nama: 'Choco Crunch', kategori: 'topping', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1621263764928-df1444c5e859?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0002', nama: 'Keju Parut', kategori: 'topping', harga: 4000, stok: 99, gambar: 'https://images.unsplash.com/photo-1552763427-4d14eb306323?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0003', nama: 'Almond Slice', kategori: 'topping', harga: 5000, stok: 99, gambar: 'https://images.unsplash.com/photo-1508061253366-f7da158b6d96?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0004', nama: 'Oreo Crumb', kategori: 'topping', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1553456523-33c861de216c?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0005', nama: 'Milo Bubuk', kategori: 'topping', harga: 4000, stok: 99, gambar: 'https://images.unsplash.com/photo-1584949514123-47bbfae57b40?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0006', nama: 'Kacang Sangrai', kategori: 'topping', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1567894252391-7686b245dc71?w=300&auto=format&fit=crop&q=60' },
 
-// Database Menu Kasir AYA GROUP
-const databaseMenu = [
-    { id: 101, nama: "Kornet", harga: 1000, kategori: "topping" },
-    { id: 102, nama: "Pentol", harga: 1000, kategori: "topping" },
-    { id: 103, nama: "Sosis Kecil", harga: 1000, kategori: "topping" },
-    { id: 104, nama: "Sosis Merah", harga: 1500, kategori: "topping" },
-    { id: 105, nama: "Sosis Salju", harga: 2000, kategori: "topping" },
-    { id: 106, nama: "Sosis Jumbo", harga: 5000, kategori: "topping" },
-    { id: 107, nama: "Bintang", harga: 1000, kategori: "topping" },
-    { id: 108, nama: "Tempura", harga: 1500, kategori: "topping" },
-    { id: 109, nama: "Scallop", harga: 1000, kategori: "topping" },
-    { id: 110, nama: "Bakso Ikan", harga: 1500, kategori: "topping" },
-    { id: 111, nama: "Tahu Bakso", harga: 1000, kategori: "topping" },
-    { id: 112, nama: "Dumpling Ayam", harga: 2000, kategori: "topping" },
-    { id: 113, nama: "Dumpling Keju", harga: 2000, kategori: "topping" },
-    { id: 114, nama: "Dumpling Spicy", harga: 2000, kategori: "topping" },
-    { id: 115, nama: "Odeng", harga: 2000, kategori: "topping" },
-    { id: 116, nama: "Cikua", harga: 1000, kategori: "topping" },
-    { id: 117, nama: "Fish Roll", harga: 2000, kategori: "topping" },
-    { id: 118, nama: "Crab Stik", harga: 2000, kategori: "topping" },
-    { id: 119, nama: "Ekor Udang", harga: 2000, kategori: "topping" },
-    { id: 120, nama: "Udang Gulung", harga: 2500, kategori: "topping" },
-    { id: 121, nama: "Kembang Cumi", harga: 1000, kategori: "topping" },
-    { id: 122, nama: "Pilus", harga: 1000, kategori: "topping" },
-    { id: 123, nama: "Cuanki Lidah", harga: 2000, kategori: "topping" },
-    { id: 124, nama: "Siomay Kering", harga: 2000, kategori: "topping" },
-    { id: 125, nama: "Krupuk Rafael", harga: 1000, kategori: "topping" },
-    { id: 126, nama: "Krupuk Orange", harga: 1000, kategori: "topping" },
-    { id: 127, nama: "Krupuk Warna", harga: 1000, kategori: "topping" },
-    { id: 128, nama: "Krupuk Bintang", harga: 1000, kategori: "topping" },
-    { id: 129, nama: "Krupuk Tangga", harga: 1000, kategori: "topping" },
-    { id: 130, nama: "Jamur Enoki", harga: 1000, kategori: "topping" },
-    { id: 131, nama: "Mie lombok", harga: 1000, kategori: "topping" },
+    // --- BASE ---
+    { id: 'P0007', nama: 'Original Base Large', kategori: 'base', harga: 15000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0008', nama: 'Original Base Medium', kategori: 'base', harga: 12000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0009', nama: 'Pandan Base Large', kategori: 'base', harga: 17000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0010', nama: 'Pandan Base Medium', kategori: 'base', harga: 14000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0011', nama: 'Red Velvet Base Large', kategori: 'base', harga: 18000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0012', nama: 'Red Velvet Base Medium', kategori: 'base', harga: 15000, stok: 99, gambar: 'https://images.unsplash.com/photo-1551024601-bec78aea704b?w=300&auto=format&fit=crop&q=60' },
 
-    { id: 201, nama: "Mie Tulang", harga: 8000, kategori: "makanan" },
-    { id: 202, nama: "Gado gado", harga: 12000, kategori: "makanan" },
-    { id: 203, nama: "Seblak All Varian", harga: 8000, kategori: "makanan" },
-    { id: 204, nama: "Nasi Kucing", harga: 5000, kategori: "makanan" },
-    { id: 205, nama: "Nasi Bakar", fontStyle: "", harga: 5000, kategori: "makanan" },
-    { id: 206, nama: "Sayap bakar", harga: 5000, kategori: "makanan" },
-    { id: 207, nama: "Kepala (Mulai)", harga: 3000, kategori: "makanan" },
-    { id: 208, nama: "Ceker (Mulai)", harga: 2000, kategori: "makanan" },
-    { id: 209, nama: "Tempe bacem", harga: 2000, kategori: "makanan" },
-    { id: 210, nama: "Tahu bacem", harga: 2000, kategori: "makanan" },
-    { id: 211, nama: "Telur puyuh bakar", harga: 3000, kategori: "makanan" },
-    { id: 212, nama: "Sate Usus", harga: 3000, kategori: "makanan" },
-    { id: 213, nama: "Sate Rempelo Ati", harga: 3000, kategori: "makanan" },
-    { id: 214, nama: "Sate Lok Lok", harga: 3000, kategori: "makanan" },
-    { id: 215, nama: "Sosis bakar", harga: 8000, kategori: "makanan" },
-
-    { id: 301, nama: "Es Teh", harga: 4000, kategori: "dingin" },
-    { id: 302, nama: "Es Dawet", harga: 5000, kategori: "dingin" },
-    { id: 303, nama: "Es Teller", harga: 10000, kategori: "dingin" },
-    { id: 304, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
-    { id: 305, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
-    { id: 306, nama: "Milo ice", harga: 6000, kategori: "dingin" },
-    { id: 307, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
-    { id: 308, nama: "Bonteh Matcha", harga: 5000, kategori: "dingin" },
-    { id: 309, nama: "Bonteh Tarik", harga: 5000, kategori: "dingin" },
-    { id: 310, nama: "Uyu Ice", harga: 5000, kategori: "dingin" },
-    { id: 311, nama: "Beng Beng Ice", harga: 6000, kategori: "dingin" },
-    { id: 312, nama: "Chocolatos Ice", harga: 6000, kategori: "dingin" },
-    { id: 313, nama: "Kuku Bima Susu Ice", harga: 7000, kategori: "dingin" },
-    { id: 314, nama: "Extra Jos Susu Ice", harga: 7000, kategori: "dingin" },
-    { id: 315, nama: "Hemaviton Susu Ice", harga: 7000, kategori: "dingin" },
-    { id: 316, nama: "Milk Ice", harga: 5000, kategori: "dingin" },
-    { id: 317, nama: "Top Coffee Gula aren Ice", harga: 5000, kategori: "dingin" },
-
-    { id: 401, nama: "Teh Hangat", harga: 4000, kategori: "panas" },
-    { id: 402, nama: "Kopi Hitam Racik", harga: 5000, kategori: "panas" },
-    { id: 403, nama: "Top Coffee Gula aren panas", harga: 6000, kategori: "panas" },
-    { id: 404, nama: "Susu Jahe Panas", harga: 5000, kategori: "panas" },
-    { id: 405, nama: "Top Kopi Susu", harga: 5000, kategori: "panas" },
-    { id: 406, nama: "Kopi Susu Racik", harga: 6000, kategori: "panas" },
-    { id: 407, nama: "Kopi Kapal Api", harga: 5000, kategori: "panas" },
-    { id: 408, nama: "Top Kopi HItam", harga: 5000, kategori: "panas" },
-    { id: 409, nama: "Kopi Brontoseno", harga: 5000, kategori: "panas" },
-    { id: 410, nama: "Kopi Luwak Hitam", harga: 5000, kategori: "panas" },
-    { id: 411, nama: "Luwak White Coffee", harga: 5000, kategori: "panas" },
-
-    { id: 501, nama: "Roti Nolanda", harga: 3000, kategori: "jajanan" },
-    { id: 502, nama: "Roti Sisir Bareto", harga: 3000, kategori: "jajanan" },
-    { id: 503, nama: "Batagor Ikan (1 porsi)", harga: 5000, kategori: "jajanan" },
-    { id: 504, nama: "Cimol", harga: 3000, kategori: "jajanan" },
-    { id: 505, nama: "Surya (1 batang)", harga: 3000, kategori: "jajanan" }
+    // --- SAUCE ---
+    { id: 'P0013', nama: 'Cokelat Lumer', kategori: 'sauce', harga: 2000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0014', nama: 'Matcha Glaze', kategori: 'sauce', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0015', nama: 'Tiramisu Glaze', kategori: 'sauce', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0016', nama: 'Susu Kental Manis', kategori: 'sauce', harga: 1000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' },
+    { id: 'P0017', nama: 'Caramel Sauce', kategori: 'sauce', harga: 3000, stok: 99, gambar: 'https://images.unsplash.com/photo-1604147706283-d7119b5b822c?w=300&auto=format&fit=crop&q=60' }
 ];
 
-// Status Aplikasi Utama
+// State Aplikasi Kompatibel V3 (Fallback ke LocalStorage jika Firebase Offline)
 let keranjang = [];
 let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
 let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
-let kategoriAktif = 'topping';
-let metodePembayaran = 'TUNAI';
-let myChart = null;
-
-let tanggalMulaiTerpilih = null;
-let tanggalSelesaiTerpilih = null;
-let tglPengeluaranMulai = null;
-let tglPengeluaranSelesai = null;
-
-const UANG_MODAL_HARIAN = 70000;
-
-// Helper: Mengambil Tanggal Sesuai Zona Waktu Lokal YYYY-MM-DD
-function dapatkanTanggalLokal() {
-    const d = new Date();
-    const offset = d.getTimezoneOffset();
-    const lokal = new Date(d.getTime() - (offset * 60 * 1000));
-    return lokal.toISOString().split('T')[0];
-}
+let currentKategori = 'topping';
+let chartInstance = null;
 
 // Sinkronisasi Firebase Realtime Database
 if (db) {
@@ -133,7 +41,9 @@ if (db) {
         const data = snapshot.val();
         riwayatTransaksi = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
         localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
-        if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
+        
+        // Pebaikan: Selalu update laporan agar grafik & hitungan laba rugi langsung terisi otomatis
+        updateLaporan();
     });
 
     db.ref('pengeluaran').on('value', (snapshot) => {
@@ -141,583 +51,401 @@ if (db) {
         pengeluaran = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
         localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
         renderPengeluaran();
-        if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
+        
+        // Perbaikan: Sinkronisasi pembaruan laporan ketika ada data pengeluaran baru masuk
+        updateLaporan();
     });
 }
 
-// Menampilkan grid tombol produk berdasarkan kategori
-function renderMenu() {
-    const container = document.getElementById('container-menu');
-    container.innerHTML = '';
-    const menuTerfilter = databaseMenu.filter(item => item.kategori === kategoriAktif);
-    menuTerfilter.forEach(item => {
-        container.innerHTML += `
-            <button onclick="tambahItem(${item.id})" class="p-2 sm:p-3 bg-white hover:bg-orange-100 border-2 border-orange-200 rounded-xl text-left transition flex flex-col justify-between h-20 active:scale-95 shadow-sm cursor-pointer">
-                <span class="font-bold text-[11px] sm:text-xs text-gray-700 uppercase tracking-tight line-clamp-2">${item.nama}</span>
-                <span class="text-orange-600 font-extrabold text-xs sm:text-sm">Rp ${item.harga.toLocaleString('id-ID')}</span>
-            </button>
-        `;
+// --- FUNGSI MANAJEMEN TABS ---
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
+    document.getElementById(tabId).classList.remove('hidden');
+
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.classList.remove('text-pink-600', 'border-pink-600', 'border-b-2');
+        btn.classList.add('text-gray-500');
     });
+
+    const activeBtn = Array.from(document.querySelectorAll('.tab-btn')).find(btn => btn.getAttribute('onclick').includes(tabId));
+    if (activeBtn) {
+        activeBtn.classList.remove('text-gray-500');
+        activeBtn.classList.add('text-pink-600', 'border-pink-600', 'border-b-2');
+    }
+
+    if (tabId === 'tab-riwayat') renderRiwayat();
+    if (tabId === 'tab-pengeluaran') renderPengeluaran();
+    if (tabId === 'tab-laporan') updateLaporan();
 }
 
-// Mengganti kategori menu aktif
-function filterKategori(kategori) {
-    kategoriAktif = kategori;
-    ['topping', 'makanan', 'dingin', 'panas', 'jajanan'].forEach(kat => {
-        const btn = document.getElementById('btn-kat-' + kat);
-        if (btn) {
-            btn.className = "px-4 py-2 font-bold text-xs sm:text-sm rounded-lg transition cursor-pointer whitespace-nowrap " + 
-                            (kat === kategori ? "bg-orange-500 text-white shadow" : "bg-gray-100 text-gray-700");
-        }
+// --- FUNGSI FORMAT MATA UANG & TANGGAL ---
+function formatRupiah(angka) {
+    return 'Rp ' + parseInt(angka).toLocaleString('id-ID');
+}
+
+function generateCustomId(prefix) {
+    const d = new Date();
+    const dateStr = `${d.getFullYear()}${String(d.getMonth()+1).padStart(2,'0')}${String(d.getDate()).padStart(2,'0')}`;
+    const randomStr = Math.random().toString(36).substring(2, 6).toUpperCase();
+    return `${prefix}-${dateStr}-${randomStr}`;
+}
+
+// --- FUNGSI TRANSAKSI & KERANJANG ---
+function filterKategori(kat) {
+    currentKategori = kat;
+    document.querySelectorAll('.kat-btn').forEach(btn => {
+        btn.classList.remove('bg-pink-600', 'text-white');
+        btn.classList.add('bg-gray-100', 'text-gray-700');
     });
+    const activeKatBtn = Array.from(document.querySelectorAll('.kat-btn')).find(btn => btn.getAttribute('onclick').includes(kat));
+    if (activeKatBtn) activeKatBtn.classList.replace('bg-gray-100', 'text-gray-700', 'bg-pink-600', 'text-white');
     renderMenu();
 }
 
-// Mengubah tipe metode pembayaran belanja
-function setMetodePembayaran(metode) {
-    metodePembayaran = metode;
-    let btnTunai = document.getElementById('btn-bayar-tunai');
-    let btnQris = document.getElementById('btn-bayar-qris');
-    let btnKonsumsi = document.getElementById('btn-bayar-konsumsi');
-    let wrapBayar = document.getElementById('wrapperUangBayar');
-    let wrapKembali = document.getElementById('wrapperKembalian');
+function renderMenu() {
+    const container = document.getElementById('container-menu');
+    if (!container) return;
+    container.innerHTML = '';
 
-    btnTunai.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
-    btnQris.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
-    btnKonsumsi.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
+    const filtered = menuList.filter(item => item.kategori === currentKategori);
+    filtered.forEach(item => {
+        const itemKeranjang = keranjang.find(k => k.id === item.id);
+        const qty = itemKeranjang ? itemKeranjang.qty : 0;
 
-    if (metode === 'TUNAI') {
-        btnTunai.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition";
-        wrapBayar.classList.remove('hidden');
-        wrapKembali.classList.remove('hidden');
-    } else {
-        let activeBtn = (metode === 'QRIS') ? btnQris : btnKonsumsi;
-        activeBtn.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition";
-        wrapBayar.classList.add('hidden');
-        wrapKembali.classList.add('hidden');
-    }
-    hitungKembalian();
+        const card = document.createElement('div');
+        card.className = 'bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden flex flex-col justify-between p-3';
+        card.innerHTML = `
+            <img src="${item.gambar}" alt="${item.nama}" class="w-full h-32 object-cover rounded-lg mb-2">
+            <div>
+                <h4 class="font-bold text-gray-800 text-sm line-clamp-2">${item.nama}</h4>
+                <p class="text-pink-600 font-semibold text-sm mt-1">${formatRupiah(item.harga)}</p>
+            </div>
+            <div class="mt-3">
+                ${qty === 0 ? 
+                    `<button onclick="tambahKeKeranjang('${item.id}')" class="w-full bg-pink-50 text-pink-600 font-medium py-1.5 rounded-lg text-xs hover:bg-pink-100 transition">Tambah</button>` :
+                    `<div class="flex items-center justify-between bg-pink-50 rounded-lg p-1">
+                        <button onclick="kurangDariKeranjang('${item.id}')" class="w-7 h-7 bg-white text-pink-600 rounded-md font-bold text-xs shadow-sm flex items-center justify-center">-</button>
+                        <span class="text-pink-700 font-bold text-sm">${qty}</span>
+                        <button onclick="tambahKeKeranjang('${item.id}')" class="w-7 h-7 bg-white text-pink-600 rounded-md font-bold text-xs shadow-sm flex items-center justify-center">+</button>
+                    </div>`
+                }
+            </div>
+        `;
+        container.appendChild(card);
+    });
 }
 
-// Menambah item ke keranjang
-function tambahItem(id) {
-    const produk = databaseMenu.find(p => p.id === id);
-    const ada = keranjang.find(k => k.id === id);
-    if (ada) {
-        ada.qty += 1;
+function tambahKeKeranjang(id) {
+    const produk = menuList.find(p => p.id === id);
+    const item = keranjang.find(k => k.id === id);
+    if (item) {
+        item.qty++;
     } else {
         keranjang.push({ ...produk, qty: 1 });
     }
-    updateKeranjang();
+    renderMenu();
+    renderKeranjang();
 }
 
-// Mengurangi/Menambah jumlah kuantitas item dalam list belanja
-function ubahQty(id, delta) {
-    const ada = keranjang.find(k => k.id !== undefined && k.id === id);
-    if(ada) {
-        ada.qty += delta;
-        if(ada.qty <= 0) {
-            keranjang = keranjang.filter(k => k.id !== id);
-        }
+function kurangDariKeranjang(id) {
+    const item = keranjang.find(k => k.id === id);
+    if (item) {
+        item.qty--;
+        if (item.qty <= 0) keranjang = keranjang.filter(k => k.id !== id);
     }
-    updateKeranjang();
+    renderMenu();
+    renderKeranjang();
 }
 
-// Kalkulasi akumulasi hitungan pesanan + ongkir + biaya styrofoam manual
-function hitungTotalKeseluruhan() {
-    let totalBelanja = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
-    if (keranjang.length === 0) return 0;
+function renderKeranjang() {
+    const container = document.getElementById('item-keranjang');
+    const totalBayarEl = document.getElementById('total-bayar');
+    if (!container) return;
 
-    let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
-    let qtyStyrofoam = parseInt(document.getElementById('inputStyrofoam').value) || 0;
-    let biayaStyrofoam = qtyStyrofoam * 1000;
+    container.innerHTML = '';
+    let total = 0;
 
-    return totalBelanja + ongkir + biayaStyrofoam;
-}
-
-// Update render data keranjang belanja di sisi kanan aplikasi
-function updateKeranjang() {
-    const container = document.getElementById('tabelKeranjang');
-    if (keranjang.length === 0) {
-        container.innerHTML = '<p class="text-gray-400 text-center py-4">Belum ada item dipilih</p>';
-        document.getElementById('textTotal').innerText = 'Rp 0';
-        hitungKembalian();
-        return;
-    }
-
-    let html = '<div class="space-y-1.5">';
     keranjang.forEach(item => {
-        let subtotal = item.harga * item.qty;
-        html += `
-            <div class="flex justify-between items-center bg-gray-50 p-2 rounded border border-gray-200">
-                <div class="flex-1 min-w-0 pr-1">
-                    <p class="font-bold text-[11px] text-gray-800 uppercase truncate">${item.nama}</p>
-                    <p class="text-[10px] text-gray-500">Rp ${item.harga.toLocaleString('id-ID')}</p>
-                </div>
-                <div class="flex items-center gap-1">
-                    <button onclick="ubahQty(${item.id}, -1)" class="w-5 h-5 bg-gray-200 rounded font-bold text-xs flex items-center justify-center text-gray-600 hover:bg-gray-300 cursor-pointer">-</button>
-                    <span class="font-bold text-xs text-gray-800 px-1">${item.qty}</span>
-                    <button onclick="ubahQty(${item.id}, 1)" class="w-5 h-5 bg-orange-500 text-white rounded font-bold text-xs flex items-center justify-center hover:bg-orange-600 cursor-pointer">+</button>
-                </div>
-                <span class="font-bold text-xs text-gray-700 w-16 text-right">Rp ${subtotal.toLocaleString('id-ID')}</span>
+        total += item.harga * item.qty;
+        const subtotal = item.harga * item.qty;
+        const row = document.createElement('div');
+        row.className = 'flex justify-between items-center bg-gray-50 p-2.5 rounded-lg border border-gray-100';
+        row.innerHTML = `
+            <div>
+                <h5 class="font-bold text-gray-800 text-xs">${item.nama}</h5>
+                <p class="text-[11px] text-gray-500">${formatRupiah(item.harga)} x ${item.qty}</p>
+            </div>
+            <div class="text-right">
+                <span class="font-bold text-gray-700 text-xs block">${formatRupiah(subtotal)}</span>
+                <button onclick="hapusItemKeranjang('${item.id}')" class="text-[10px] text-red-500 hover:underline mt-0.5">Hapus</button>
             </div>
         `;
+        container.appendChild(row);
     });
-    html += '</div>';
-    container.innerHTML = html;
 
-    let totalAkhir = hitungTotalKeseluruhan();
-    document.getElementById('textTotal').innerText = 'Rp ' + totalAkhir.toLocaleString('id-ID');
-    hitungKembalian();
+    if (totalBayarEl) totalBayarEl.innerText = formatRupiah(total);
 }
 
-// Mengukur nominal kembalian pembayaran tunai
-function hitungKembalian() {
-    let total = hitungTotalKeseluruhan();
-    if (metodePembayaran === 'QRIS' || metodePembayaran === 'KONSUMSI') {
-        document.getElementById('textKembalian').innerText = 'Rp 0';
+function hapusItemKeranjang(id) {
+    keranjang = keranjang.filter(k => k.id !== id);
+    renderMenu();
+    renderKeranjang();
+}
+
+function prosesTransaksi() {
+    if (keranjang.length === 0) {
+        alert('Keranjang belanja kosong!');
         return;
     }
-    let bayar = parseInt(document.getElementById('inputBayar').value) || 0;
-    let kembalian = bayar - total;
-    document.getElementById('textKembalian').innerText = kembalian >= 0 ? 'Rp ' + kembalian.toLocaleString('id-ID') : 'Uang Kurang';
-}
 
-// Mengosongkan keranjang kembali semula
-function bersihkanKeranjang() {
-    keranjang = [];
-    document.getElementById('inputBayar').value = '';
-    document.getElementById('inputOngkir').value = '';
-    document.getElementById('inputStyrofoam').value = '';
-    setMetodePembayaran('TUNAI');
-    updateKeranjang();
-}
-
-// Proses Menyimpan Transaksi Ke Firebase/Localstorage
-function simpanTransaksi() {
-    if (keranjang.length === 0) { alert('Keranjang kosong!'); return false; }
-    let total = hitungTotalKeseluruhan();
-    let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
-    let qtyStyrofoam = parseInt(document.getElementById('inputStyrofoam').value) || 0;
+    const total = keranjang.reduce((sum, item) => sum + (item.harga * item.qty), 0);
+    const idTrx = generateCustomId('TRX');
     
-    let bayar = total;
-    let kembalian = 0;
-
-    if (metodePembayaran === 'TUNAI') {
-        bayar = parseInt(document.getElementById('inputBayar').value) || 0;
-        if (bayar < total) { alert('Uang pembayaran Anda masih kurang!'); return false; }
-        kembalian = bayar - total;
-    }
-
-    let idNota = 'NOTA-' + Date.now();
-    let tglLokal = dapatkanTanggalLokal();
-    let nota = {
-        id: idNota,
-        waktu: new Date().toLocaleString('id-ID'),
-        tanggalISO: tglLokal,
-        items: [...keranjang],
-        total: total,
-        bayar: bayar,
-        kembalian: kembalian,
-        metodePembayaran: metodePembayaran,
-        ongkir: ongkir,
-        qtyStyrofoam: qtyStyrofoam
+    const transaksiBaru = {
+        id: idTrx,
+        tanggal: new Date().toISOString(),
+        items: keranjang,
+        total: total
     };
 
     if (db) {
-        db.ref('transaksi/' + idNota).set(nota);
+        db.ref('transaksi/' + idTrx).set(transaksiBaru)
+            .then(() => resetSetelahTransaksi())
+            .catch(err => alert('Gagal menyimpan ke Firebase: ' + err.message));
     } else {
-        riwayatTransaksi.unshift(nota);
+        riwayatTransaksi.unshift(transaksiBaru);
         localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+        resetSetelahTransaksi();
+    }
+}
+
+function resetSetelahTransaksi() {
+    keranjang = [];
+    renderKeranjang();
+    filterKategori(currentKategori);
+    alert('Transaksi Berhasil Disimpan!');
+}
+
+// --- FUNGSI HALAMAN RIWAYAT ---
+function renderRiwayat() {
+    const container = document.getElementById('list-riwayat');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (riwayatTransaksi.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Belum ada riwayat transaksi.</p>';
+        return;
+    }
+
+    riwayatTransaksi.forEach(trx => {
+        const itemText = trx.items.map(i => `${i.nama} (${i.qty})`).join(', ');
+        const tgl = new Date(trx.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' });
+        
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-start';
+        card.innerHTML = `
+            <div class="space-y-1 max-w-[70%]">
+                <span class="text-[11px] font-mono bg-pink-50 text-pink-600 px-2 py-0.5 rounded-md font-bold">${trx.id}</span>
+                <p class="text-xs text-gray-400">${tgl}</p>
+                <p class="text-xs text-gray-700 font-medium line-clamp-2 mt-1">${itemText}</p>
+            </div>
+            <div class="text-right flex flex-col items-end space-y-2">
+                <span class="font-bold text-gray-800 text-sm">${formatRupiah(trx.total)}</span>
+                <button onclick="hapusTransaksi('${trx.id}')" class="text-[10px] text-red-500 hover:bg-red-50 px-2 py-1 rounded transition border border-red-100">Hapus</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function hapusTransaksi(id) {
+    if (!confirm('Apakah Anda yakin ingin menghapus transaksi ini?')) return;
+    if (db) {
+        db.ref('transaksi/' + id).remove()
+            .catch(err => alert('Gagal menghapus data Firebase: ' + err.message));
+    } else {
+        riwayatTransaksi = riwayatTransaksi.filter(t => t.id !== id);
+        localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
+        renderRiwayat();
         updateLaporan();
     }
-    return true;
 }
 
-function tombolSimpanSaja() {
-    let sukses = simpanTransaksi();
-    if(sukses) {
-        alert('Sukses! Transaksi Berhasil Disimpan.');
-        bersihkanKeranjang();
-    }
-}
-
-// Mengisi element cetak nota thermal & memanggil fungsi cetak windows
-function cetakNota() {
-    if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
-    let total = hitungTotalKeseluruhan();
-    let ongkir = parseInt(document.getElementById('inputOngkir').value) || 0;
-    let qtyStyrofoam = parseInt(document.getElementById('inputStyrofoam').value) || 0;
+// --- FUNGSI HALAMAN PENGELUARAN ---
+function tambahPengeluaran(e) {
+    if(e) e.preventDefault();
+    const nama = document.getElementById('out-nama').value;
+    const jumlah = parseInt(document.getElementById('out-jumlah').value);
     
-    let bayar = total;
-    if (metodePembayaran === 'TUNAI') {
-        bayar = parseInt(document.getElementById('inputBayar').value) || 0;
-        if (bayar < total) return alert('Input uang bayar dengan benar sebelum mencetak!');
-    }
+    if(!nama || !jumlah) return;
 
-    document.getElementById('notaWaktu').innerHTML = `
-        <div>Waktu: ${new Date().toLocaleString('id-ID')}</div>
-        <div>No   : REG-${Date.now().toString().slice(-6)}</div>
-    `;
-    document.getElementById('notaMetode').innerHTML = `METODE PEMBAYARAN: ${metodePembayaran}`;
-    
-    let htmlItems = '';
-    keranjang.forEach(item => {
-        let subtotal = item.harga * item.qty;
-        htmlItems += `
-            <div class="flex justify-between font-bold text-gray-900"><span>${item.nama.toUpperCase()}</span></div>
-            <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
-        `;
-    });
-    
-    if(qtyStyrofoam > 0) {
-        let subtotalStyrofoam = qtyStyrofoam * 1000;
-        htmlItems += `
-            <div class="flex justify-between font-bold text-gray-900"><span>STYROFOAM</span></div>
-            <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${qtyStyrofoam} x Rp 1.000</span><span>Rp ${subtotalStyrofoam.toLocaleString('id-ID')}</span></div>
-        `;
-    }
-    if(ongkir > 0) {
-        htmlItems += `
-            <div class="flex justify-between font-bold text-gray-900"><span>ONGKOS KIRIM</span></div>
-            <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  Manual Input</span><span>Rp ${ongkir.toLocaleString('id-ID')}</span></div>
-        `;
-    }
-
-    document.getElementById('notaItems').innerHTML = htmlItems;
-    
-    document.getElementById('notaTotal').innerHTML = `
-        <div class="flex justify-between font-bold text-[13px] mt-1"><span>TOTAL :</span><span>Rp ${total.toLocaleString('id-ID')}</span></div>
-        <div class="flex justify-between text-gray-800"><span>BAYAR :</span><span>Rp ${bayar.toLocaleString('id-ID')}</span></div>
-        <div class="flex justify-between text-gray-800 font-bold"><span>KEMBALI:</span><span>Rp ${(bayar - total).toLocaleString('id-ID')}</span></div>
-    `;
-    
-    setTimeout(() => {
-        window.print();
-        let sukses = simpanTransaksi();
-        if(sukses) {
-            bersihkanKeranjang();
-        }
-    }, 300);
-}
-
-// Mencatat data pengeluaran operasional baru
-function simpanPengeluaran() {
-    let nama = document.getElementById('namaPengeluaran').value;
-    let biaya = parseInt(document.getElementById('biayaPengeluaran').value) || 0;
-    if(!nama || biaya <= 0) return alert('Silakan masukkan nama barang & harga yang benar!');
-
-    let idPengeluaran = 'EXP-' + Date.now();
-    let tglLokal = dapatkanTanggalLokal();
-    let dataPengeluaran = { 
-        id: idPengeluaran,
-        nama: nama, 
-        biaya: biaya, 
-        waktu: new Date().toLocaleString('id-ID'),
-        tanggalISO: tglLokal
+    const idOut = generateCustomId('OUT');
+    const dataBaru = {
+        id: idOut,
+        tanggal: new Date().toISOString(),
+        keterangan: nama,
+        jumlah: jumlah
     };
 
     if (db) {
-        db.ref('pengeluaran/' + idPengeluaran).set(dataPengeluaran);
+        db.ref('pengeluaran/' + idOut).set(dataBaru)
+            .then(() => {
+                document.getElementById('form-pengeluaran').reset();
+                alert('Pengeluaran berhasil disimpan!');
+            });
     } else {
-        pengeluaran.unshift(dataPengeluaran);
+        pengeluaran.unshift(dataBaru);
+        localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
+        document.getElementById('form-pengeluaran').reset();
+        renderPengeluaran();
+        updateLaporan();
+    }
+}
+
+function renderPengeluaran() {
+    const container = document.getElementById('list-pengeluaran');
+    if (!container) return;
+    container.innerHTML = '';
+
+    if (pengeluaran.length === 0) {
+        container.innerHTML = '<p class="text-center text-gray-400 py-8 text-sm">Belum ada catatan pengeluaran.</p>';
+        return;
+    }
+
+    pengeluaran.forEach(out => {
+        const tgl = new Date(out.tanggal).toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' });
+        const card = document.createElement('div');
+        card.className = 'bg-white border border-gray-100 rounded-xl p-3 shadow-sm flex justify-between items-center';
+        card.innerHTML = `
+            <div>
+                <h5 class="font-bold text-gray-800 text-xs">${out.keterangan}</h5>
+                <p class="text-[11px] text-gray-400">${tgl} · <span class="font-mono text-[10px]">${out.id}</span></p>
+            </div>
+            <div class="flex items-center space-x-3">
+                <span class="font-bold text-red-600 text-sm">-${formatRupiah(out.jumlah)}</span>
+                <button onclick="hapusPengeluaran('${out.id}')" class="text-gray-400 hover:text-red-500 text-xs">✕</button>
+            </div>
+        `;
+        container.appendChild(card);
+    });
+}
+
+function hapusPengeluaran(id) {
+    if (!confirm('Hapus catatan pengeluaran ini?')) return;
+    if (db) {
+        db.ref('pengeluaran/' + id).remove();
+    } else {
+        pengeluaran = pengeluaran.filter(o => o.id !== id);
         localStorage.setItem('aya_pengeluaran_v3', JSON.stringify(pengeluaran));
         renderPengeluaran();
         updateLaporan();
     }
-
-    document.getElementById('namaPengeluaran').value = '';
-    document.getElementById('biayaPengeluaran').value = '';
-    alert('Pengeluaran berhasil dicatat!');
 }
 
-// Menampilkan list data rekap pengeluaran operasional di tab Pengeluaran
-function renderPengeluaran() {
-    let container = document.getElementById('listPengeluaran');
-    let hariIniISO = dapatkanTanggalLokal();
-
-    let pengeluaranTerfilter = pengeluaran.filter(p => {
-        if (tglPengeluaranMulai && tglPengeluaranSelesai) {
-            return p.tanggalISO >= tglPengeluaranMulai && p.tanggalISO <= tglPengeluaranSelesai;
-        }
-        return p.tanggalISO === hariIniISO;
-    });
-
-    pengeluaranTerfilter.sort((a, b) => b.id.localeCompare(a.id));
-
-    container.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400 py-2 text-center text-xs">Tidak ada pengeluaran pada periode ini</p>' : '';
-    pengeluaranTerfilter.forEach(p => {
-        container.innerHTML += `<div class="flex justify-between py-1.5 text-gray-700 border-b border-gray-100"><span>📌 ${p.nama} <br><small class="text-gray-400">${p.waktu}</small></span><span class="font-bold text-red-500">Rp ${p.biaya.toLocaleString('id-ID')}</span></div>`;
-    });
-}
-
-// Memasukkan tambahan modal kas fisik riil (diluar omset penjualan bisnis)
-function simpanModalTambahan() {
-    let nominal = parseInt(document.getElementById('inputModalTambahan').value) || 0;
-    if (nominal <= 0) return alert('Silakan masukkan nominal modal tambahan yang valid!');
-
-    let idNota = 'NOTA-MODAL-' + Date.now();
-    let tglLokal = dapatkanTanggalLokal();
-    let dataModalSebagaiPemasukan = {
-        id: idNota,
-        waktu: new Date().toLocaleString('id-ID'),
-        tanggalISO: tglLokal,
-        items: [{ id: 999, nama: "TAMBAHAN MODAL CASH", harga: nominal, qty: 1, kategori: "modal" }],
-        total: nominal,
-        bayar: nominal,
-        kembalian: 0,
-        metodePembayaran: 'MODAL_MASUK',
-        ongkir: 0,
-        qtyStyrofoam: 0
-    };
-
-    if (db) {
-        db.ref('transaksi/' + idNota).set(dataModalSebagaiPemasukan);
-    } else {
-        riwayatTransaksi.unshift(dataModalSebagaiPemasukan);
-        localStorage.setItem('aya_transaksi_v3', JSON.stringify(riwayatTransaksi));
-        updateLaporan();
-    }
-
-    document.getElementById('inputModalTambahan').value = '';
-    alert('Tambahan modal berhasil disimpan langsung ke dalam Kas Pemasukan!');
-}
-
-function terapkanFilterTanggal() {
-    let mulai = document.getElementById('filterTanggalMulai').value;
-    let selesai = document.getElementById('filterTanggalSelesai').value;
-    if(!mulai || !selesai) return alert('Silakan pilih rentang tanggal mulai dan selesai!');
-    tanggalMulaiTerpilih = mulai;
-    tanggalSelesaiTerpilih = selesai;
-    updateLaporan();
-}
-
-function resetFilterTanggal() {
-    document.getElementById('filterTanggalMulai').value = '';
-    document.getElementById('filterTanggalSelesai').value = '';
-    tanggalMulaiTerpilih = null;
-    tanggalSelesaiTerpilih = null;
-    updateLaporan();
-}
-
-function hitungHariUnik(transaksi, pengeluaran) {
-    let setHari = new Set();
-    transaksi.forEach(n => setHari.add(n.tanggalISO));
-    pengeluaran.forEach(p => setHari.add(p.tanggalISO));
-    return setHari.size || 1;
-}
-
-function terapkanFilterPengeluaran() {
-    let mulai = document.getElementById('filterPengeluaranMulai').value;
-    let selesai = document.getElementById('filterPengeluaranSelesai').value;
-    if(!mulai || !selesai) return alert('Silakan pilih rentang tanggal mulai dan selesai!');
-    tglPengeluaranMulai = mulai;
-    tglPengeluaranSelesai = selesai;
-    renderPengeluaran();
-}
-
-function resetFilterPengeluaran() {
-    document.getElementById('filterPengeluaranMulai').value = '';
-    document.getElementById('filterPengeluaranSelesai').value = '';
-    tglPengeluaranMulai = null;
-    tglPengeluaranSelesai = null;
-    renderPengeluaran();
-}
-
-// Memproses kalkulasi seluruh statistik dashboard rekap laba-rugi & grafik chart
+// --- FUNGSI HALAMAN REKAP & GRAFIK (LAPORAN) ---
 function updateLaporan() {
-    let hariIniISO = dapatkanTanggalLokal();
+    let omset = 0;
+    let totalOut = 0;
+    const produkTerjual = {};
 
-    let transaksiTerfilter = riwayatTransaksi.filter(n => {
-        if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
-            return n.tanggalISO >= tanggalMulaiTerpilih && n.tanggalISO <= tanggalSelesaiTerpilih;
+    // Hitung total omset dan pemetaan produk terjual
+    riwayatTransaksi.forEach(trx => {
+        omset += trx.total;
+        trx.items.forEach(item => {
+            produkTerjual[item.nama] = (produkTerjual[item.nama] || 0) + item.qty;
+        });
+    });
+
+    // Hitung total pengeluaran
+    pengeluaran.forEach(out => {
+        totalOut += out.jumlah;
+    });
+
+    const labaRugi = omset - totalOut;
+
+    // Masukkan data ke DOM HTML
+    const omsetEl = document.getElementById('rep-omset');
+    const pengeluaranEl = document.getElementById('rep-pengeluaran');
+    const labaEl = document.getElementById('rep-laba');
+
+    if (omsetEl) omsetEl.innerText = formatRupiah(omset);
+    if (pengeluaranEl) pengeluaranEl.innerText = formatRupiah(totalOut);
+    if (labaEl) {
+        labaEl.innerText = formatRupiah(labaRugi);
+        if (labaRugi >= 0) {
+            labaEl.className = "text-xl font-bold text-emerald-600";
+        } else {
+            labaEl.className = "text-xl font-bold text-red-600";
         }
-        return n.tanggalISO === hariIniISO;
-    });
-
-    let pengeluaranTerfilter = pengeluaran.filter(p => {
-        if (tanggalMulaiTerpilih && tanggalSelesaiTerpilih) {
-            return p.tanggalISO >= tanggalMulaiTerpilih && p.tanggalISO <= tanggalSelesaiTerpilih;
-        }
-        return p.tanggalISO === hariIniISO;
-    });
-
-    transaksiTerfilter.sort((a, b) => b.id.localeCompare(a.id));
-    pengeluaranTerfilter.sort((a, b) => b.id.localeCompare(a.id));
-
-    let omsetTunai = 0, omsetQris = 0, omsetKonsumsi = 0, omsetModalMasuk = 0;
-
-    transaksiTerfilter.forEach(n => {
-        if (n.metodePembayaran === 'QRIS') { omsetQris += n.total; } 
-        else if (n.metodePembayaran === 'KONSUMSI') { omsetKonsumsi += n.total; } 
-        else if (n.metodePembayaran === 'MODAL_MASUK') { omsetModalMasuk += n.total; } 
-        else { omsetTunai += n.total; }
-    });
-
-    let omsetBisnisTotal = omsetTunai + omsetQris;
-    let jumlahHari = hitungHariUnik(transaksiTerfilter, pengeluaranTerfilter);
-    let totalModalPeriode = UANG_MODAL_HARIAN * jumlahHari;
-    let totalBeban = pengeluaranTerfilter.reduce((sum, p) => sum + p.biaya, 0);
-    
-    let labaRugiBersih = omsetBisnisTotal - totalBeban;
-    let totalUangCashFisik = totalModalPeriode + omsetModalMasuk + omsetTunai - totalBeban;
-
-    // Render Data Statistik Card
-    document.getElementById('statOmset').innerText = 'Rp ' + omsetBisnisTotal.toLocaleString('id-ID');
-    document.getElementById('statOmsetTunai').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
-    document.getElementById('statOmsetQris').innerText = 'Rp ' + omsetQris.toLocaleString('id-ID');
-    document.getElementById('statOmsetModalMasuk').innerText = 'Rp ' + omsetModalMasuk.toLocaleString('id-ID');
-    document.getElementById('statOmsetKonsumsi').innerText = 'Rp ' + omsetKonsumsi.toLocaleString('id-ID');
-    document.getElementById('statPengeluaran').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
-    document.getElementById('statNota').innerText = transaksiTerfilter.length + ' Item';
-
-    document.getElementById('statUangCash').innerText = 'Rp ' + totalUangCashFisik.toLocaleString('id-ID');
-    document.getElementById('statModal').innerText = 'Rp ' + totalModalPeriode.toLocaleString('id-ID');
-    document.getElementById('statModalTambahan').innerText = 'Rp ' + omsetModalMasuk.toLocaleString('id-ID');
-    document.getElementById('statCashMasuk').innerText = 'Rp ' + omsetTunai.toLocaleString('id-ID');
-    document.getElementById('statBebanCash').innerText = 'Rp ' + totalBeban.toLocaleString('id-ID');
-
-    const elBox = document.getElementById('boxLabaRugi');
-    const elLabel = document.getElementById('labelLabaRugi');
-    const elStat = document.getElementById('statLabaRugi');
-
-    if (labaRugiBersih >= 0) {
-        elLabel.innerText = "📈 LABA BERSIH PENJUALAN";
-        elStat.innerText = 'Rp ' + labaRugiBersih.toLocaleString('id-ID');
-        elBox.className = "p-4 rounded-xl shadow border bg-emerald-50 border-emerald-200 text-emerald-700 flex flex-col justify-between";
-    } else {
-        elLabel.innerText = "📉 RUGI BERSIH";
-        elStat.innerText = '- Rp ' + Math.abs(labaRugiBersih).toLocaleString('id-ID');
-        elBox.className = "p-4 rounded-xl shadow border bg-red-50 border-red-200 text-red-700 flex flex-col justify-between";
     }
 
-    // Render Pengeluaran Detail pada Tab Rekap
-    let containerRekapPengeluaran = document.getElementById('rekapPengeluaranDetail');
-    containerRekapPengeluaran.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada pengeluaran pada periode ini</p>' : '';
-    pengeluaranTerfilter.forEach(p => {
-        containerRekapPengeluaran.innerHTML += `
-            <div class="flex justify-between items-center p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
-                <div>
-                    <p class="font-bold text-gray-800 uppercase">📌 ${p.nama}</p>
-                    <p class="text-[10px] text-gray-400">🕒 ${p.waktu}</p>
-                </div>
-                <span class="font-extrabold text-red-600">Rp ${p.biaya.toLocaleString('id-ID')}</span>
-            </div>
-        `;
-    });
+    // Pembuatan Grafik Chart.js
+    const ctx = document.getElementById('chartProdukLaku');
+    if (!ctx) return;
 
-    // Render List Riwayat Nota Pemasukan Lengkap
-    let containerNota = document.getElementById('riwayatNota');
-    containerNota.innerHTML = transaksiTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada riwayat pada periode ini</p>' : '';
-    
-    transaksiTerfilter.forEach(n => {
-        let badgeColor = 'bg-green-100 text-green-800';
-        if (n.metodePembayaran === 'QRIS') badgeColor = 'bg-blue-100 text-blue-800';
-        if (n.metodePembayaran === 'KONSUMSI') badgeColor = 'bg-purple-100 text-purple-800';
-        if (n.metodePembayaran === 'MODAL_MASUK') badgeColor = 'bg-teal-600 text-white font-black';
-        
-        let badgeMetode = n.metodePembayaran === 'MODAL_MASUK' ? 'MODAL MASUK' : (n.metodePembayaran || 'TUNAI');
+    const sortedProduk = Object.entries(produkTerjual)
+        .sort((a, b) => b[1] - a[1])
+        .slice(0, 5);
 
-        let detailItemsHtml = `
-            <div class="mt-3 border-t border-gray-200 pt-2 text-[11px] text-gray-700">
-                <table class="w-full text-left border-collapse">
-                    <thead>
-                        <tr class="text-gray-400 uppercase text-[9px] tracking-wider border-b border-gray-100">
-                            <th class="pb-1 font-semibold">Nama Item</th>
-                            <th class="pb-1 text-center font-semibold">Harga</th>
-                            <th class="pb-1 text-center font-semibold">Qty</th>
-                            <th class="pb-1 text-right font-semibold">Subtotal</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-gray-100/50">
-        `;
+    const labels = sortedProduk.map(p => p[0]);
+    const dataValues = sortedProduk.map(p => p[1]);
 
-        if (n.items && n.items.length > 0) {
-            n.items.forEach(i => {
-                let sub = i.harga * i.qty;
-                detailItemsHtml += `
-                    <tr>
-                        <td class="py-1 font-medium text-gray-800">${i.nama}</td>
-                        <td class="py-1 text-center text-gray-500">Rp ${i.harga.toLocaleString('id-ID')}</td>
-                        <td class="py-1 text-center font-bold text-gray-600">${i.qty}x</td>
-                        <td class="py-1 text-right font-bold text-gray-800">Rp ${sub.toLocaleString('id-ID')}</td>
-                    </tr>
-                `;
-            });
-        }
+    if (chartInstance) {
+        chartInstance.destroy();
+    }
 
-        if (n.qtyStyrofoam > 0) {
-            let subtotalBungkus = n.qtyStyrofoam * 1000;
-            detailItemsHtml += `
-                <tr class="text-gray-500 italic">
-                    <td class="py-1">📦 Styrofoam</td>
-                    <td class="py-1 text-center">Rp 1.000</td>
-                    <td class="py-1 text-center">${n.qtyStyrofoam}x</td>
-                    <td class="py-1 text-right">Rp ${subtotalBungkus.toLocaleString('id-ID')}</td>
-                </tr>
-            `;
-        }
+    if(labels.length === 0) {
+        ctx.style.display = 'none';
+        const nodata = document.getElementById('no-chart-data') || document.createElement('p');
+        nodata.id = 'no-chart-data';
+        nodata.className = 'text-center text-gray-400 text-xs py-8';
+        nodata.innerText = 'Belum ada data penjualan untuk dibuat grafik.';
+        if(!document.getElementById('no-chart-data')) ctx.parentNode.appendChild(nodata);
+        return;
+    } else {
+        ctx.style.display = 'block';
+        const nodata = document.getElementById('no-chart-data');
+        if(nodata) nodata.remove();
+    }
 
-        if (n.ongkir > 0) {
-            detailItemsHtml += `
-                <tr class="text-gray-500 italic">
-                    <td class="py-1">🛵 Ongkos Kirim</td>
-                    <td class="py-1 text-center">-</td>
-                    <td class="py-1 text-center">-</td>
-                    <td class="py-1 text-right">Rp ${n.ongkir.toLocaleString('id-ID')}</td>
-                </tr>
-            `;
-        }
-
-        detailItemsHtml += `</tbody></table></div>`;
-
-        containerNota.innerHTML += `
-            <div class="p-4 bg-white rounded-xl border border-orange-100 shadow-sm text-xs text-gray-600">
-                <div class="flex justify-between items-center font-bold text-gray-800 mb-1">
-                    <span class="text-sm">🧾 ${n.id} <span class="ml-2 px-2 py-0.5 text-[10px] rounded-md ${badgeColor}">${badgeMetode}</span></span>
-                    <span class="text-emerald-600 text-base font-extrabold">Rp ${n.total.toLocaleString('id-ID')}</span>
-                </div>
-                <p class="text-gray-400 text-[10px]">📅 ${n.waktu}</p>
-                ${detailItemsHtml}
-            </div>
-        `;
-    });
-
-    // Kalkulasi Data Grafik Chart Terlaris
-    let produkCounts = {};
-    transaksiTerfilter.forEach(n => {
-        if(n.metodePembayaran !== 'MODAL_MASUK') { 
-            n.items.forEach(i => { produkCounts[i.nama] = (produkCounts[i.nama] || 0) + i.qty; });
-        }
-    });
-    let urutProduk = Object.keys(produkCounts).map(name => ({ name, qty: produkCounts[name] })).sort((a,b) => b.qty - a.qty).slice(0, 5);
-
-    if (myChart) myChart.destroy();
-    const ctx = document.getElementById('chartProdukLaku').getContext('2d');
-    myChart = new Chart(ctx, {
+    chartInstance = new Chart(ctx, {
         type: 'bar',
         data: {
-            labels: urutProduk.map(p => p.name),
+            labels: labels,
             datasets: [{
-                label: 'Total Terjual',
-                data: urutProduk.map(p => p.qty),
-                backgroundColor: '#ea580c',
-                borderWidth: 0
+                label: 'Qty Terjual',
+                data: dataValues,
+                backgroundColor: 'rgba(219, 39, 119, 0.2)',
+                borderColor: 'rgba(219, 39, 119, 1)',
+                borderWidth: 1.5,
+                borderRadius: 6
             }]
         },
-        options: { responsive: true, scales: { y: { beginAtZero: true } } }
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    ticks: { stepSize: 1, color: '#9CA3AF', font: { size: 10 } },
+                    grid: { color: '#F3F4F6' }
+                },
+                x: {
+                    ticks: { color: '#4B5563', font: { size: 10 } },
+                    grid: { display: false }
+                }
+            },
+            plugins: {
+                legend: { display: false }
+            }
+        }
     });
 }
 
-// Navigasi Tab Menu Utama Kasir
-function switchTab(tab) {
-    document.getElementById('tab-kasir').classList.add('hidden');
-    document.getElementById('tab-pengeluaran').classList.add('hidden');
-    document.getElementById('tab-laporan').classList.add('hidden');
-    document.getElementById('tab-' + tab).classList.remove('hidden');
-    if(tab === 'laporan') updateLaporan();
-}
-
-// Pemicu Inisialisasi Pertama Kali Web Dimuat
-filterKategori('topping');
-renderPengeluaran();
+// --- PEMICU INISIALISASI PERTAMA KALI WEB DIMUAT ---
+// Perbaikan: Memastikan DOM & database siap sebelum me-render data ke antarmuka aplikasi
+document.addEventListener("DOMContentLoaded", () => {
+    filterKategori('topping');
+    renderPengeluaran();
+    updateLaporan();
+});
