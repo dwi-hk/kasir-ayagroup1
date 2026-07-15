@@ -108,21 +108,54 @@
             </div>
         </div>
 
-        <div id="tab-pengeluaran" class="hidden bg-white p-6 rounded-xl shadow border border-orange-100 max-w-lg mx-auto">
+        <div id="tab-pengeluaran" class="hidden bg-white p-6 rounded-xl shadow border border-orange-100 max-w-xl mx-auto">
             <h2 class="text-xl font-bold text-orange-600 mb-4">💸 Catat Pengeluaran Operasional</h2>
-            <div class="space-y-3">
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Nama Pengeluaran / Barang:</label>
-                    <input type="text" id="namaPengeluaran" class="w-full p-2 border border-gray-300 rounded focus:outline-orange-500" placeholder="Contoh: Beli es batu, minyak goreng">
+            <div class="space-y-3 bg-orange-50 p-4 rounded-xl border border-orange-100 mb-4">
+                <div class="grid grid-cols-1 sm:grid-cols-4 gap-2">
+                    <div class="sm:col-span-1">
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Barang:</label>
+                        <input type="text" id="namaPengeluaran" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500" placeholder="Contoh: Es batu">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Harga Satuan:</label>
+                        <input type="number" id="hargaPengeluaran" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500" placeholder="0">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Qty:</label>
+                        <input type="number" id="qtyPengeluaran" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500" placeholder="1" value="1" min="1">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-gray-600 mb-1">Satuan:</label>
+                        <select id="satuanPengeluaran" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500">
+                            <option value="pcs" selected>pcs</option>
+                            <option value="kg">kg</option>
+                            <option value="liter">liter</option>
+                            <option value="bungkus">bungkus</option>
+                            <option value="pack">pack</option>
+                            <option value="ikat">ikat</option>
+                            <option value="dus">dus</option>
+                            <option value="renteng">renteng</option>
+                            <option value="lembar">lembar</option>
+                        </select>
+                    </div>
                 </div>
-                <div>
-                    <label class="block text-sm font-semibold text-gray-600 mb-1">Biaya (Rp):</label>
-                    <input type="number" id="biayaPengeluaran" class="w-full p-2 border border-gray-300 rounded focus:outline-orange-500" placeholder="0">
-                </div>
-                <button onclick="simpanPengeluaran()" class="w-full bg-orange-500 text-white font-bold py-2 rounded hover:bg-orange-600 transition cursor-pointer">➕ Tambah Pengeluaran</button>
+                <button onclick="tambahKeDaftarBelanja()" class="w-full bg-orange-500 text-white text-xs font-bold py-2 rounded hover:bg-orange-600 transition cursor-pointer">➕ Masukkan ke Daftar Belanja</button>
             </div>
 
-            <h3 class="font-bold text-gray-700 mt-6 mb-2 border-b pb-1">Daftar Pengeluaran</h3>
+            <div class="border border-orange-200 rounded-lg p-3 bg-white mb-4">
+                <h4 class="text-xs font-bold text-orange-600 mb-2">📋 Daftar Belanja Saat Ini</h4>
+                <div id="tabelBelanjaPengeluaran" class="max-h-[25vh] overflow-y-auto divide-y divide-gray-100 text-xs">
+                    <p class="text-gray-400 text-center py-4">Belum ada barang di daftar belanja</p>
+                </div>
+                <div class="flex justify-between items-center mt-3 pt-2 border-t border-gray-200 font-bold text-sm text-gray-800">
+                    <span>Total Pengeluaran:</span>
+                    <span id="totalBelanjaPengeluaran" class="text-red-500">Rp 0</span>
+                </div>
+            </div>
+
+            <button onclick="simpanPengeluaran()" class="w-full bg-emerald-600 text-white font-bold py-2.5 rounded shadow hover:bg-emerald-700 transition cursor-pointer">💾 Simpan Semua Pengeluaran</button>
+
+            <h3 class="font-bold text-gray-700 mt-6 mb-2 border-b pb-1">Daftar Pengeluaran Tersimpan</h3>
             <div class="grid grid-cols-2 gap-2 mb-3">
                 <div>
                     <label class="block text-[10px] font-bold text-gray-500 mb-0.5">Mulai Tanggal:</label>
@@ -138,7 +171,7 @@
                 <button onclick="resetFilterPengeluaran()" class="w-1/2 bg-gray-200 text-gray-700 text-xs font-semibold py-2 rounded hover:bg-gray-300 cursor-pointer transition">Hari Ini</button>
             </div>
 
-            <div id="listPengeluaran" class="text-sm space-y-1 divide-y divide-gray-100 max-h-[30vh] overflow-y-auto">
+            <div id="listPengeluaran" class="text-sm space-y-1.5 divide-y divide-gray-100 max-h-[30vh] overflow-y-auto">
             </div>
         </div>
 
@@ -222,7 +255,7 @@
                 </div>
                 <div class="bg-white p-4 rounded-xl shadow border border-orange-100">
                     <h3 class="font-bold text-gray-700 mb-4">💸 Rekap Pengeluaran Detail Periode Ini</h3>
-                    <div id="rekapPengeluaranDetail" class="space-y-2 max-h-[50vh] overflow-y-auto">
+                    <div id="rekapPengeluaranDetail" class="space-y-3 max-h-[50vh] overflow-y-auto">
                     </div>
                 </div>
             </div>
@@ -334,7 +367,7 @@
             { id: 301, nama: "Es Teh", harga: 4000, kategori: "dingin" },
             { id: 302, nama: "Es Dawet", harga: 5000, kategori: "dingin" },
             { id: 303, nama: "Es Teller", harga: 10000, kategori: "dingin" },
-            { id: 304, nama: "Pop Ice", harga: 5000, kategori: "dingin" },
+            { id: 304, font: "light", nama: "Pop Ice", harga: 5000, kategori: "dingin" },
             { id: 305, nama: "Nutri sari Ice", harga: 5000, kategori: "dingin" },
             { id: 306, nama: "Milo ice", harga: 6000, kategori: "dingin" },
             { id: 307, nama: "Good Day ice", harga: 6000, kategori: "dingin" },
@@ -369,6 +402,7 @@
         ];
 
         let keranjang = [];
+        let keranjangPengeluaran = []; // FUNGSI BARU: Keranjang belanja operasional sebelum disimpan
         let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
         let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
         let kategoriAktif = 'topping';
@@ -420,6 +454,7 @@
             });
         }
 
+        // Penyaringan kategori menu
         function filterKategori(kategori) {
             kategoriAktif = kategori;
             ['topping', 'makanan', 'dingin', 'panas', 'jajanan'].forEach(kat => {
@@ -710,19 +745,98 @@
             }, 300);
         }
 
-        function simpanPengeluaran() {
-            let nama = document.getElementById('namaPengeluaran').value;
-            let biaya = parseInt(document.getElementById('biayaPengeluaran').value) || 0;
-            if(!nama || biaya <= 0) return alert('Silakan masukkan nama barang & harga yang benar!');
+        // FUNGSI BARU: Logika penambahan barang ke list pengeluaran operasional
+        function tambahKeDaftarBelanja() {
+            let nama = document.getElementById('namaPengeluaran').value.trim();
+            let harga = parseInt(document.getElementById('hargaPengeluaran').value) || 0;
+            let qty = parseInt(document.getElementById('qtyPengeluaran').value) || 1;
+            let satuan = document.getElementById('satuanPengeluaran').value;
 
+            if (!nama || harga <= 0 || qty <= 0) {
+                return alert('Silakan masukkan nama barang, harga satuan, dan quantity dengan benar!');
+            }
+
+            let idItem = 'EXP-ITEM-' + Date.now();
+            let subtotal = harga * qty;
+
+            keranjangPengeluaran.push({
+                id: idItem,
+                nama: nama,
+                harga: harga,
+                qty: qty,
+                satuan: satuan,
+                subtotal: subtotal
+            });
+
+            document.getElementById('namaPengeluaran').value = '';
+            document.getElementById('hargaPengeluaran').value = '';
+            document.getElementById('qtyPengeluaran').value = '1';
+            document.getElementById('satuanPengeluaran').value = 'pcs';
+
+            updateDaftarBelanjaPengeluaran();
+        }
+
+        function hapusItemBelanjaPengeluaran(idItem) {
+            keranjangPengeluaran = keranjangPengeluaran.filter(item => item.id !== idItem);
+            updateDaftarBelanjaPengeluaran();
+        }
+
+        function updateDaftarBelanjaPengeluaran() {
+            let container = document.getElementById('tabelBelanjaPengeluaran');
+            let totalEl = document.getElementById('totalBelanjaPengeluaran');
+
+            if (keranjangPengeluaran.length === 0) {
+                container.innerHTML = '<p class="text-gray-400 text-center py-4">Belum ada barang di daftar belanja</p>';
+                totalEl.innerText = 'Rp 0';
+                return;
+            }
+
+            let html = '<div class="space-y-1.5">';
+            let total = 0;
+
+            keranjangPengeluaran.forEach(item => {
+                total += item.subtotal;
+                html += `
+                    <div class="flex justify-between items-center py-1.5 border-b border-gray-100">
+                        <div class="flex-1">
+                            <p class="font-bold text-gray-800 uppercase">${item.nama}</p>
+                            <p class="text-[10px] text-gray-500">${item.qty} ${item.satuan} x Rp ${item.harga.toLocaleString('id-ID')}</p>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <span class="font-bold text-gray-700">Rp ${item.subtotal.toLocaleString('id-ID')}</span>
+                            <button onclick="hapusItemBelanjaPengeluaran('${item.id}')" class="text-red-500 font-bold hover:text-red-700 cursor-pointer">❌</button>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            container.innerHTML = html;
+            totalEl.innerText = 'Rp ' + total.toLocaleString('id-ID');
+        }
+
+        function simpanPengeluaran() {
+            if (keranjangPengeluaran.length === 0) {
+                return alert('Silakan tambahkan barang belanjaan ke daftar terlebih dahulu!');
+            }
+
+            let totalBiaya = keranjangPengeluaran.reduce((sum, item) => sum + item.subtotal, 0);
             let idPengeluaran = 'EXP-' + Date.now();
             let tglLokal = dapatkanTanggalLokal();
+
+            // Membuat ringkasan singkat nama pengeluaran utama
+            let namaRingkas = keranjangPengeluaran.map(item => `${item.nama} (${item.qty} ${item.satuan})`).join(', ');
+            if (namaRingkas.length > 50) {
+                namaRingkas = namaRingkas.slice(0, 47) + '...';
+            }
+
             let dataPengeluaran = { 
                 id: idPengeluaran,
-                nama: nama, 
-                biaya: biaya, 
+                nama: namaRingkas, 
+                biaya: totalBiaya, 
                 waktu: new Date().toLocaleString('id-ID'),
-                tanggalISO: tglLokal
+                tanggalISO: tglLokal,
+                items: [...keranjangPengeluaran] // Menyimpan detail item secara komprehensif
             };
 
             if (db) {
@@ -734,9 +848,9 @@
                 updateLaporan();
             }
 
-            document.getElementById('namaPengeluaran').value = '';
-            document.getElementById('biayaPengeluaran').value = '';
-            alert('Pengeluaran berhasil dicatat!');
+            keranjangPengeluaran = [];
+            updateDaftarBelanjaPengeluaran();
+            alert('Pengeluaran berhasil dicatat secara detail!');
         }
 
         function renderPengeluaran() {
@@ -754,7 +868,28 @@
 
             container.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400 py-2 text-center text-xs">Tidak ada pengeluaran pada periode ini</p>' : '';
             pengeluaranTerfilter.forEach(p => {
-                container.innerHTML += `<div class="flex justify-between py-1.5 text-gray-700 border-b border-gray-100"><span>📌 ${p.nama} <br><small class="text-gray-400">${p.waktu}</small></span><span class="font-bold text-red-500">Rp ${p.biaya.toLocaleString('id-ID')}</span></div>`;
+                let detailItemsHtml = '';
+                if(p.items && p.items.length > 0) {
+                    detailItemsHtml = `<div class="mt-1 pl-3 border-l-2 border-orange-300 text-[11px] text-gray-500 space-y-0.5">`;
+                    p.items.forEach(i => {
+                        let satuanTampil = i.satuan || 'pcs';
+                        detailItemsHtml += `<div>• ${i.nama} x ${i.qty} ${satuanTampil} @ Rp ${i.harga.toLocaleString('id-ID')} = Rp ${i.subtotal.toLocaleString('id-ID')}</div>`;
+                    });
+                    detailItemsHtml += `</div>`;
+                }
+
+                container.innerHTML += `
+                    <div class="py-2 text-gray-700 border-b border-gray-100 flex flex-col">
+                        <div class="flex justify-between items-start">
+                            <span>
+                                📌 <span class="font-semibold">${p.nama}</span>
+                                <br><small class="text-gray-400">${p.waktu}</small>
+                            </span>
+                            <span class="font-bold text-red-500">Rp ${p.biaya.toLocaleString('id-ID')}</span>
+                        </div>
+                        ${detailItemsHtml}
+                    </div>
+                `;
             });
         }
 
@@ -904,16 +1039,53 @@
                 elBox.className = "p-4 rounded-xl shadow border bg-red-50 border-red-200 text-red-700 flex flex-col justify-between";
             }
 
+            // REKAP DETAIL PENGELUARAN DENGAN FORMAT TABEL SEPERTI NOTA PENJUALAN
             let containerRekapPengeluaran = document.getElementById('rekapPengeluaranDetail');
             containerRekapPengeluaran.innerHTML = pengeluaranTerfilter.length === 0 ? '<p class="text-gray-400">Tidak ada pengeluaran pada periode ini</p>' : '';
             pengeluaranTerfilter.forEach(p => {
-                containerRekapPengeluaran.innerHTML += `
-                    <div class="flex justify-between items-center p-2.5 bg-gray-50 rounded-lg border border-gray-200 text-xs text-gray-600">
-                        <div>
-                            <p class="font-bold text-gray-800 uppercase">📌 ${p.nama}</p>
-                            <p class="text-[10px] text-gray-400">🕒 ${p.waktu}</p>
+                let detailTabelItems = '';
+                if (p.items && p.items.length > 0) {
+                    detailTabelItems = `
+                        <div class="mt-2 border-t border-gray-200 pt-2 text-[11px] text-gray-700">
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-gray-400 uppercase text-[9px] tracking-wider border-b border-gray-100">
+                                        <th class="pb-1 font-semibold">Nama Barang</th>
+                                        <th class="pb-1 text-center font-semibold">Harga</th>
+                                        <th class="pb-1 text-center font-semibold">Qty</th>
+                                        <th class="pb-1 text-right font-semibold">Subtotal</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="divide-y divide-gray-100/50">
+                    `;
+                    p.items.forEach(item => {
+                        let satuanTampil = item.satuan || 'pcs';
+                        detailTabelItems += `
+                            <tr>
+                                <td class="py-1 font-medium text-gray-800">${item.nama}</td>
+                                <td class="py-1 text-center text-gray-500">Rp ${item.harga.toLocaleString('id-ID')}</td>
+                                <td class="py-1 text-center font-bold text-gray-600">${item.qty} ${satuanTampil}</td>
+                                <td class="py-1 text-right font-bold text-gray-800">Rp ${item.subtotal.toLocaleString('id-ID')}</td>
+                            </tr>
+                        `;
+                    });
+                    detailTabelItems += `
+                                </tbody>
+                            </table>
                         </div>
-                        <span class="font-extrabold text-red-600">Rp ${p.biaya.toLocaleString('id-ID')}</span>
+                    `;
+                }
+
+                containerRekapPengeluaran.innerHTML += `
+                    <div class="p-4 bg-white rounded-xl border border-orange-100 shadow-sm text-xs text-gray-600 flex flex-col justify-between">
+                        <div>
+                            <div class="flex justify-between items-center font-bold text-gray-800 mb-1">
+                                <span class="text-sm">🧾 ${p.id}</span>
+                                <span class="text-red-600 text-base font-extrabold">Rp ${p.biaya.toLocaleString('id-ID')}</span>
+                            </div>
+                            <p class="text-gray-400 text-[10px]">🕒 ${p.waktu}</p>
+                            ${detailTabelItems}
+                        </div>
                     </div>
                 `;
             });
@@ -986,7 +1158,7 @@
                     </div>
                 `;
 
-                // Di sini ditambahkan tombol "Cetak Ulang" di bagian footer setiap nota rekap
+                // Tombol "Cetak Ulang" di bagian footer setiap nota rekap
                 containerNota.innerHTML += `
                     <div class="p-4 bg-white rounded-xl border border-orange-100 shadow-sm text-xs text-gray-600 flex flex-col justify-between">
                         <div>
