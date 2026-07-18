@@ -54,8 +54,43 @@
         <div id="tab-kasir" class="grid grid-cols-1 lg:grid-cols-3 gap-6">
             
             <div class="lg:col-span-2 bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-col">
-                <h2 class="text-xl font-bold text-orange-600 mb-2">➕ Pilihan Menu & Topping</h2>
-                <p class="text-xs text-gray-500 mb-4">Pilih kategori di bawah, lalu klik item untuk menambah pesanan.</p>
+                <div class="flex justify-between items-center mb-2 flex-wrap gap-2">
+                    <div>
+                        <h2 class="text-xl font-bold text-orange-600">➕ Pilihan Menu & Topping</h2>
+                        <p class="text-xs text-gray-500">Pilih kategori di bawah, lalu klik item untuk menambah pesanan.</p>
+                    </div>
+                    <!-- TAMBAHAN: Tombol memunculkan form input menu baru -->
+                    <button onclick="toggleFormMenu()" class="px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-lg shadow hover:bg-emerald-700 transition cursor-pointer">➕ Tambah Menu Baru</button>
+                </div>
+
+                <!-- TAMBAHAN: Form Input Menu Baru (Hidden by default) -->
+                <div id="formTambahMenu" class="hidden bg-orange-50 p-4 rounded-xl border border-orange-200 mb-4 transition-all duration-300">
+                    <h3 class="text-sm font-bold text-gray-700 mb-2">Form Tambah Kategori / Menu Jual Baru</h3>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Nama Menu:</label>
+                            <input type="text" id="menuNama" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500" placeholder="Contoh: Bakso Mercon">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Harga Jual (Rp):</label>
+                            <input type="number" id="menuHarga" min="0" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500" placeholder="0">
+                        </div>
+                        <div>
+                            <label class="block text-xs font-semibold text-gray-600 mb-1">Kategori:</label>
+                            <select id="menuKategori" class="w-full p-2 border border-gray-300 bg-white text-xs rounded focus:outline-orange-500">
+                                <option value="topping">🍢 Topping / Krupuk Seblak</option>
+                                <option value="makanan">🍲 Makanan / Bakaran</option>
+                                <option value="dingin">❄️ Minuman Dingin</option>
+                                <option value="panas">☕ Minuman Hangat</option>
+                                <option value="jajanan">🚬 Jajanan / Rokok</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex gap-2 justify-end">
+                        <button onclick="toggleFormMenu()" class="px-4 py-2 bg-gray-200 text-gray-700 text-xs font-semibold rounded hover:bg-gray-300 cursor-pointer">Batal</button>
+                        <button onclick="tambahMenuDatabase()" class="px-4 py-2 bg-emerald-600 text-white text-xs font-bold rounded hover:bg-emerald-700 cursor-pointer">💾 Simpan Menu</button>
+                    </div>
+                </div>
                 
                 <div class="flex gap-2 mb-4 border-b border-gray-200 pb-3 overflow-x-auto">
                     <button id="btn-kat-topping" onclick="filterKategori('topping')" class="px-4 py-2 bg-orange-500 text-white font-bold text-xs sm:text-sm rounded-lg shadow transition cursor-pointer whitespace-nowrap">🍢 Topping / Krupuk Seblak</button>
@@ -542,7 +577,57 @@
             return lokal.toISOString().split('T')[0];
         }
 
+        // TAMBAHAN: Fungsi Tampilkan & Sembunyikan Form Tambah Menu Baru
+        function toggleFormMenu() {
+            const form = document.getElementById('formTambahMenu');
+            form.classList.toggle('hidden');
+        }
+
+        // TAMBAHAN: Fungsi Menyimpan Menu Baru ke Database / Array Lokal
+        function tambahMenuDatabase() {
+            let nama = document.getElementById('menuNama').value.trim();
+            let harga = parseInt(document.getElementById('menuHarga').value) || 0;
+            let kategori = document.getElementById('menuKategori').value;
+
+            if(!nama || harga <= 0) {
+                return alert('Mohon isi nama menu dan harga jual dengan benar!');
+            }
+
+            let idBarang = 'MENU-' + Date.now();
+            let dataMenuBaru = {
+                id: idBarang,
+                nama: nama,
+                harga: harga,
+                kategori: kategori
+            };
+
+            // Simpan ke Firebase Realtime Database jika aktif, jika tidak backup ke array
+            if(db) {
+                db.ref('menu_tambahan/' + idBarang).set(dataMenuBaru);
+            } else {
+                databaseMenu.push(dataMenuBaru);
+                filterKategori(kategori);
+            }
+
+            document.getElementById('menuNama').value = '';
+            document.getElementById('menuHarga').value = '';
+            toggleFormMenu();
+            alert('Menu baru berhasil ditambahkan!');
+        }
+
         if (db) {
+            // TAMBAHAN: Listener Sinkronisasi otomatis data menu dari Firebase Realtime DB
+            db.ref('menu_tambahan').on('value', (snapshot) => {
+                const data = snapshot.val();
+                if(data) {
+                    Object.values(data).forEach(m => {
+                        const adaDiMenu = databaseMenu.find(dm => String(dm.id) === String(m.id));
+                        if(!adaDiMenu) databaseMenu.push(m);
+                    });
+                    renderMenu();
+                }
+            });
+
             db.ref('transaksi').on('value', (snapshot) => {
                 const data = snapshot.val();
                 riwayatTransaksi = data ? Object.values(data).sort((a, b) => b.id.localeCompare(a.id)) : [];
@@ -733,7 +818,6 @@
         }
 
         function setMetodePembayaran(metode) {
-            metodePembayaran = metode;
             let btnTunai = document.getElementById('btn-bayar-tunai');
             let btnQris = document.getElementById('btn-bayar-qris');
             let btnKonsumsi = document.getElementById('btn-bayar-konsumsi');
@@ -744,6 +828,7 @@
             btnQris.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
             btnKonsumsi.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-gray-100 text-gray-700 border border-gray-200 cursor-pointer transition";
 
+            metodePembayaran = metode;
             if (metode === 'TUNAI') {
                 btnTunai.className = "py-2 text-center text-[10px] font-bold rounded-lg bg-orange-600 text-white shadow border border-orange-600 cursor-pointer transition";
                 wrapBayar.classList.remove('hidden');
@@ -1014,13 +1099,11 @@
                 <div class="flex justify-between text-gray-800 font-bold"><span>KEMBALI:</span><span>Rp ${(bayar - total).toLocaleString('id-ID')}</span></div>
             `;
             
-            // Tampilkan area nota sesaat sebelum memanggil fungsi print bawaan OS
             const notaArea = document.getElementById('areaNota');
             notaArea.style.display = 'block';
 
             setTimeout(() => {
                 window.print();
-                // Sembunyikan kembali area nota setelah jendela print ditutup
                 notaArea.style.display = 'none';
 
                 let sukses = simpanTransaksi();
@@ -1096,7 +1179,7 @@
             let satuan = document.getElementById('satuanPengeluaran').value;
 
             if (!nama || harga <= 0 || qty <= 0) {
-                return alert('Silakan masukkan nama barang, harga satuan, dan quantity dengan benar!');
+                return alert('Silakan masukkan nama barang, harga satuan, and quantity dengan benar!');
             }
 
             let idItem = 'EXP-ITEM-' + Date.now();
