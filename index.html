@@ -7,18 +7,31 @@
     <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <style>
-        /* Desain struk belanja khusus cetak printer thermal */
+        /* PERBAIKAN CSS CETAK: Menjamin area nota terlihat & elemen lain tersembunyi total saat print */
         @media print {
-            body * { visibility: hidden; }
-            #areaNota, #areaNota * { visibility: visible; }
+            body * { 
+                visibility: hidden !important; 
+                height: 0 !important; 
+                overflow: hidden !important;
+                margin: 0 !important;
+                padding: 0 !important;
+            }
+            #areaNota, #areaNota * { 
+                visibility: visible !important; 
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
             #areaNota { 
-                display: block !important; /* Solusi agar class "hidden" Tailwind di-override saat print */
-                position: absolute; 
-                left: 0; 
-                top: 0; 
-                width: 100%; 
-                font-family: monospace; 
-                color: #000;
+                position: absolute !important; 
+                left: 0 !important; 
+                top: 0 !important; 
+                width: 100% !important; 
+                max-width: 100% !important;
+                font-family: monospace !important; 
+                color: #000 !important;
+                background: #fff !important;
+                padding: 5px !important;
             }
         }
     </style>
@@ -372,8 +385,8 @@
 
     </div>
 
-    <!-- AREA NOTA THERMAL TERBARU DENGAN HEADER DETAIL -->
-    <div id="areaNota" class="hidden p-2 text-[12px] font-mono w-64 bg-white text-black leading-tight">
+    <!-- AREA NOTA THERMAL TERBARU (DIHAPUS CLASS 'hidden' DARI TAILWIND AGAR TIDAK BENTROK SAAT PRINT) -->
+    <div id="areaNota" style="display: none;" class="p-2 text-[12px] font-mono w-64 bg-white text-black leading-tight">
         <div class="text-center font-bold text-[13px]">AYA SEBLAK & ANGKRINGAN</div>
         <div class="text-center text-[10px]">Samping Alfamart Prambon</div>
         <div class="text-center text-[10px]">WA: 0851 3679 8499</div>
@@ -952,7 +965,6 @@
             }
         }
 
-        // PERBAIKAN FUNGSI CETAK NOTA UTAMA
         function cetakNota() {
             if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
             let total = hitungTotalKeseluruhan();
@@ -1002,8 +1014,15 @@
                 <div class="flex justify-between text-gray-800 font-bold"><span>KEMBALI:</span><span>Rp ${(bayar - total).toLocaleString('id-ID')}</span></div>
             `;
             
+            // Tampilkan area nota sesaat sebelum memanggil fungsi print bawaan OS
+            const notaArea = document.getElementById('areaNota');
+            notaArea.style.display = 'block';
+
             setTimeout(() => {
                 window.print();
+                // Sembunyikan kembali area nota setelah jendela print ditutup
+                notaArea.style.display = 'none';
+
                 let sukses = simpanTransaksi();
                 if(sukses) {
                     bersihkanKeranjang();
@@ -1011,7 +1030,6 @@
             }, 300);
         }
 
-        // PERBAIKAN FUNGSI CETAK ULANG NOTA DARI RIWAYAT
         function cetakUlangNota(idNota) {
             const notaLama = riwayatTransaksi.find(n => n.id === idNota);
             if (!notaLama) return alert('Nota transaksi tidak ditemukan!');
@@ -1062,8 +1080,12 @@
                 <div class="flex justify-between text-gray-800 font-bold"><span>KEMBALI:</span><span>Rp ${kembali.toLocaleString('id-ID')}</span></div>
             `;
             
+            const notaArea = document.getElementById('areaNota');
+            notaArea.style.display = 'block';
+
             setTimeout(() => {
                 window.print();
+                notaArea.style.display = 'none';
             }, 300);
         }
 
