@@ -372,12 +372,14 @@
 
     </div>
 
+    <!-- AREA NOTA THERMAL TERBARU DENGAN HEADER DETAIL -->
     <div id="areaNota" class="hidden p-2 text-[12px] font-mono w-64 bg-white text-black leading-tight">
-        <div class="text-center font-bold text-[14px]">AYA GROUP</div>
-        <div class="text-center text-[10px]">Pusat Kuliner Terbaik</div>
+        <div class="text-center font-bold text-[13px]">AYA SEBLAK & ANGKRINGAN</div>
+        <div class="text-center text-[10px]">Samping Alfamart Prambon</div>
+        <div class="text-center text-[10px]">WA: 0851 3679 8499</div>
         <div class="text-center my-1">--------------------------------</div>
         <div id="notaWaktu" class="text-[10px]"></div>
-        <div id="notaMetode" class="text-[11px] font-bold"></div>
+        <div id="notaMetode" class="text-[10px] font-bold"></div>
         <div class="text-center my-1">--------------------------------</div>
         <div id="notaItems" class="space-y-1"></div>
         <div class="text-center my-1">--------------------------------</div>
@@ -505,8 +507,6 @@
         let keranjangPengeluaran = []; 
         let riwayatTransaksi = JSON.parse(localStorage.getItem('aya_transaksi_v3')) || [];
         let pengeluaran = JSON.parse(localStorage.getItem('aya_pengeluaran_v3')) || [];
-        
-        // KODE BARU: Array penampung data barang titipan
         let barangTitipan = JSON.parse(localStorage.getItem('aya_titipan_v3')) || [];
 
         let kategoriAktif = 'topping';
@@ -529,7 +529,6 @@
             return lokal.toISOString().split('T')[0];
         }
 
-        // Realtime Firebase Synchronization
         if (db) {
             db.ref('transaksi').on('value', (snapshot) => {
                 const data = snapshot.val();
@@ -547,7 +546,6 @@
                 if(!document.getElementById('tab-laporan').classList.contains('hidden')) updateLaporan();
             });
 
-            // KODE BARU: Firebase Sync Barang Titipan
             db.ref('barang_titipan').on('value', (snapshot) => {
                 const data = snapshot.val();
                 barangTitipan = data ? Object.values(data) : [];
@@ -556,7 +554,6 @@
             });
         }
 
-        // KODE BARU: Fungsi menambah Barang Titipan Baru
         function tambahBarangTitipan() {
             let nama = document.getElementById('titipanNama').value.trim();
             let jumlah = parseInt(document.getElementById('titipanJumlah').value) || 0;
@@ -588,7 +585,6 @@
                 hitungOtomatisTerjualTitipan();
             }
 
-            // Reset input form
             document.getElementById('titipanNama').value = '';
             document.getElementById('titipanJumlah').value = '';
             document.getElementById('titipanKontak').value = '';
@@ -597,10 +593,7 @@
             alert('Barang titipan berhasil ditambahkan!');
         }
 
-        // KODE BARU: Fungsi menghitung otomatis kolom berdasarkan transaksi kasir dan render tabel titipan
         function hitungOtomatisTerjualTitipan() {
-            // Gabungkan menu bawaan dengan barang titipan agar bisa dipilih di kasir
-            // Kategori barang titipan otomatis masuk ke 'jajanan' agar muncul di kasir
             barangTitipan.forEach(bt => {
                 const adaDiMenu = databaseMenu.find(m => m.id === bt.id || m.nama.toLowerCase() === bt.nama.toLowerCase());
                 if (!adaDiMenu) {
@@ -620,7 +613,6 @@
                 return;
             }
 
-            // Hitung total terjual per nama barang dari seluruh riwayat transaksi
             let counterTerjual = {};
             riwayatTransaksi.forEach(t => {
                 if(t.items) {
@@ -638,8 +630,6 @@
 
                 let profitSatuan = bt.hargaJual - bt.hargaBeli;
                 let totalProfit = profitSatuan * terjual;
-
-                // Hutang Terjual = Total yang harus diberikan ke pemilik titipan berdasarkan barang yang laku
                 let hutangTerjual = bt.hargaBeli * terjual; 
 
                 html += `
@@ -670,7 +660,6 @@
             container.innerHTML = html;
         }
 
-        // KODE BARU: Fungsi Aksi untuk input Pembayaran Hutang Pemilik dan Jumlah Retur Barang
         function kelolaTitipan(id, jenis) {
             let item = barangTitipan.find(b => b.id === id);
             if(!item) return;
@@ -693,7 +682,6 @@
             }
         }
 
-        // KODE BARU: Fungsi Hapus Data Barang Titipan
         function hapusBarangTitipan(id) {
             if(!confirm('Apakah Anda yakin ingin menghapus data barang titipan ini?')) return;
             if(db) {
@@ -719,7 +707,6 @@
             });
         }
 
-        // Penyaringan kategori menu
         function filterKategori(kategori) {
             kategoriAktif = kategori;
             ['topping', 'makanan', 'dingin', 'panas', 'jajanan'].forEach(kat => {
@@ -965,6 +952,7 @@
             }
         }
 
+        // PERBAIKAN FUNGSI CETAK NOTA UTAMA
         function cetakNota() {
             if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
             let total = hitungTotalKeseluruhan();
@@ -1023,6 +1011,7 @@
             }, 300);
         }
 
+        // PERBAIKAN FUNGSI CETAK ULANG NOTA DARI RIWAYAT
         function cetakUlangNota(idNota) {
             const notaLama = riwayatTransaksi.find(n => n.id === idNota);
             if (!notaLama) return alert('Nota transaksi tidak ditemukan!');
@@ -1039,7 +1028,7 @@
                     let subtotal = item.harga * item.qty;
                     htmlItems += `
                         <div class="flex justify-between font-bold text-gray-900"><span>${item.nama.toUpperCase()}</span></div>
-                        <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${notaLama.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
+                        <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
                     `;
                 });
             }
@@ -1547,7 +1536,6 @@
             if(tab === 'titipan') hitungOtomatisTerjualTitipan();
         }
 
-        // Inisialisasi Halaman Utama
         filterKategori('topping');
         renderPengeluaran();
         hitungOtomatisTerjualTitipan();
