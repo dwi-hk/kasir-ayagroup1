@@ -33,6 +33,24 @@
                 background: #fff !important;
                 padding: 5px !important;
             }
+            /* Mengubah container item nota menjadi 2 kolom grid saat dicetak */
+            #notaItems {
+                display: grid !important;
+                grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+                gap: 4px 8px !important;
+            }
+            /* Memastikan pembungkus item menggunakan flex layout internal */
+            .nota-item-row {
+                display: flex !important;
+                flex-direction: column !important;
+                border-bottom: 1px dashed #ccc !important;
+                padding-bottom: 2px !important;
+            }
+            .nota-item-detail {
+                display: flex !important;
+                justify-content: space-between !important;
+                font-size: 10px !important;
+            }
         }
     </style>
 </head>
@@ -59,11 +77,10 @@
                         <h2 class="text-xl font-bold text-orange-600">➕ Pilihan Menu & Topping</h2>
                         <p class="text-xs text-gray-500">Pilih kategori di bawah, lalu klik item untuk menambah pesanan.</p>
                     </div>
-                    <!-- TAMBAHAN: Tombol memunculkan form input menu baru -->
                     <button onclick="toggleFormMenu()" class="px-3 py-1.5 bg-emerald-600 text-white font-bold text-xs rounded-lg shadow hover:bg-emerald-700 transition cursor-pointer">➕ Tambah Menu Baru</button>
                 </div>
 
-                <!-- TAMBAHAN: Form Input Menu Baru (Hidden by default) -->
+                <!-- Form Input Menu Baru -->
                 <div id="formTambahMenu" class="hidden bg-orange-50 p-4 rounded-xl border border-orange-200 mb-4 transition-all duration-300">
                     <h3 class="text-sm font-bold text-gray-700 mb-2">Form Tambah Kategori / Menu Jual Baru</h3>
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-3">
@@ -114,7 +131,6 @@
                 </div>
 
                 <div class="bg-orange-100/50 p-4 rounded-lg mt-4 border border-orange-200">
-                    
                     <div class="grid grid-cols-2 gap-2 mb-3">
                         <div>
                             <label class="block text-xs font-bold text-gray-600 mb-1">Jml Styrofoam (Mnl):</label>
@@ -288,7 +304,6 @@
 
         <!-- TAB LAPORAN REKAP -->
         <div id="tab-laporan" class="hidden space-y-6">
-            
             <div class="bg-white p-4 rounded-xl shadow border border-orange-100 flex flex-wrap items-end justify-between gap-4">
                 <div class="flex flex-wrap items-end gap-4">
                     <div>
@@ -417,10 +432,9 @@
                 </div>
             </div>
         </div>
-
     </div>
 
-    <!-- AREA NOTA THERMAL TERBARU (DIHAPUS CLASS 'hidden' DARI TAILWIND AGAR TIDAK BENTROK SAAT PRINT) -->
+    <!-- AREA NOTA THERMAL TERBARU (MENGGUNAKAN GRID 2 KOLOM SAAT PRINT) -->
     <div id="areaNota" style="display: none;" class="p-2 text-[12px] font-mono w-64 bg-white text-black leading-tight">
         <div class="text-center font-bold text-[13px]">AYA SEBLAK & ANGKRINGAN</div>
         <div class="text-center text-[10px]">Samping Alfamart Prambon</div>
@@ -429,7 +443,8 @@
         <div id="notaWaktu" class="text-[10px]"></div>
         <div id="notaMetode" class="text-[10px] font-bold"></div>
         <div class="text-center my-1">--------------------------------</div>
-        <div id="notaItems" class="space-y-1"></div>
+        <!-- Target CSS Grid Cetak -->
+        <div id="notaItems"></div>
         <div class="text-center my-1">--------------------------------</div>
         <div id="notaTotal" class="space-y-0.5"></div>
         <div class="text-center my-1">--------------------------------</div>
@@ -577,13 +592,11 @@
             return lokal.toISOString().split('T')[0];
         }
 
-        // TAMBAHAN: Fungsi Tampilkan & Sembunyikan Form Tambah Menu Baru
         function toggleFormMenu() {
             const form = document.getElementById('formTambahMenu');
             form.classList.toggle('hidden');
         }
 
-        // TAMBAHAN: Fungsi Menyimpan Menu Baru ke Database / Array Lokal
         function tambahMenuDatabase() {
             let nama = document.getElementById('menuNama').value.trim();
             let harga = parseInt(document.getElementById('menuHarga').value) || 0;
@@ -601,7 +614,6 @@
                 kategori: kategori
             };
 
-            // Simpan ke Firebase Realtime Database jika aktif, jika tidak backup ke array
             if(db) {
                 db.ref('menu_tambahan/' + idBarang).set(dataMenuBaru);
             } else {
@@ -616,7 +628,6 @@
         }
 
         if (db) {
-            // TAMBAHAN: Listener Sinkronisasi otomatis data menu dari Firebase Realtime DB
             db.ref('menu_tambahan').on('value', (snapshot) => {
                 const data = snapshot.val();
                 if(data) {
@@ -1050,6 +1061,7 @@
             }
         }
 
+        /* PERBAIKAN STRUK: Render item nota menjadi pembungkus tunggal per produk */
         function cetakNota() {
             if (keranjang.length === 0) return alert('Keranjang belanja masih kosong!');
             let total = hitungTotalKeseluruhan();
@@ -1072,22 +1084,37 @@
             keranjang.forEach(item => {
                 let subtotal = item.harga * item.qty;
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900"><span>${item.nama.toUpperCase()}</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
+                    <div class="nota-item-row font-bold text-gray-900">
+                        <span class="truncate uppercase">${item.nama}</span>
+                        <div class="nota-item-detail font-normal text-gray-700">
+                            <span>${item.qty}x${item.harga.toLocaleString('id-ID')}</span>
+                            <span>Rp${subtotal.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
                 `;
             });
             
             if(qtyStyrofoam > 0) {
                 let subtotalStyrofoam = qtyStyrofoam * 1000;
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900"><span>STYROFOAM</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${qtyStyrofoam} x Rp 1.000</span><span>Rp ${subtotalStyrofoam.toLocaleString('id-ID')}</span></div>
+                    <div class="nota-item-row font-bold text-gray-900">
+                        <span>STYROFOAM</span>
+                        <div class="nota-item-detail font-normal text-gray-700">
+                            <span>${qtyStyrofoam}x1.000</span>
+                            <span>Rp${subtotalStyrofoam.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
                 `;
             }
             if(ongkir > 0) {
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900"><span>ONGKOS KIRIM</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  Manual Input</span><span>Rp ${ongkir.toLocaleString('id-ID')}</span></div>
+                    <div class="nota-item-row font-bold text-gray-900">
+                        <span>ONGKOS KIRIM</span>
+                        <div class="nota-item-detail font-normal text-gray-700">
+                            <span>Manual</span>
+                            <span>Rp${ongkir.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
                 `;
             }
 
@@ -1113,6 +1140,7 @@
             }, 300);
         }
 
+        /* PERBAIKAN STRUK PADA CETAK ULANG: Menyelaraskan struktur data nota 2 kolom */
         function cetakUlangNota(idNota) {
             const notaLama = riwayatTransaksi.find(n => n.id === idNota);
             if (!notaLama) return alert('Nota transaksi tidak ditemukan!');
@@ -1128,8 +1156,13 @@
                 notaLama.items.forEach(item => {
                     let subtotal = item.harga * item.qty;
                     htmlItems += `
-                        <div class="flex justify-between font-bold text-gray-900"><span>${item.nama.toUpperCase()}</span></div>
-                        <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${item.qty} x Rp ${item.harga.toLocaleString('id-ID')}</span><span>Rp ${subtotal.toLocaleString('id-ID')}</span></div>
+                        <div class="nota-item-row font-bold text-gray-900">
+                            <span class="truncate uppercase">${item.nama}</span>
+                            <div class="nota-item-detail font-normal text-gray-700">
+                                <span>${item.qty}x${item.harga.toLocaleString('id-ID')}</span>
+                                <span>Rp${subtotal.toLocaleString('id-ID')}</span>
+                            </div>
+                        </div>
                     `;
                 });
             }
@@ -1137,14 +1170,24 @@
             if(notaLama.qtyStyrofoam > 0) {
                 let subtotalStyrofoam = notaLama.qtyStyrofoam * 1000;
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900"><span>STYROFOAM</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  ${notaLama.qtyStyrofoam} x Rp 1.000</span><span>Rp ${subtotalStyrofoam.toLocaleString('id-ID')}</span></div>
+                    <div class="nota-item-row font-bold text-gray-900">
+                        <span>STYROFOAM</span>
+                        <div class="nota-item-detail font-normal text-gray-700">
+                            <span>${notaLama.qtyStyrofoam}x1.000</span>
+                            <span>Rp${subtotalStyrofoam.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
                 `;
             }
             if(notaLama.ongkir > 0) {
                 htmlItems += `
-                    <div class="flex justify-between font-bold text-gray-900"><span>ONGKOS KIRIM</span></div>
-                    <div class="flex justify-between pl-2 text-[11px] text-gray-700"><span>  Manual Input</span><span>Rp ${notaLama.ongkir.toLocaleString('id-ID')}</span></div>
+                    <div class="nota-item-row font-bold text-gray-900">
+                        <span>ONGKOS KIRIM</span>
+                        <div class="nota-item-detail font-normal text-gray-700">
+                            <span>Manual</span>
+                            <span>Rp${notaLama.ongkir.toLocaleString('id-ID')}</span>
+                        </div>
+                    </div>
                 `;
             }
 
